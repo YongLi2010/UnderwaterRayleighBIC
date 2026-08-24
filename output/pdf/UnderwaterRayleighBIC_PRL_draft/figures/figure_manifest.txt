@@ -1,0 +1,39 @@
+Theory figure manifest (vector PDF export)
+Data source: /Users/YongLI/Library/Mobile Documents/com~apple~CloudDocs/Research/TongjiU/Students/王泉森/UnderwaterRayleighBIC/Ni2019_MATLAB/results/PRL_article_figure_data_v5.mat
+Geometry: a=6.87113 mm, f0=200 kHz, theta0=5.25122 deg, N/K field=313/39
+Numerical truncation: maps N/K=61/9; route fields and reciprocal audit N/K=313/39;
+  strict homogeneous mode N/K=313/39; pole track uses cached continuation (N/K=121/15);
+  tolerance uses the cached (121,15) strict root; off-Rayleigh spectra use N/K=201/25;
+  off-Rayleigh convergence reports N/K = 81/11, 121/15, 161/20, 201/25, 313/39, 401/50.
+
+fig1_structure_topology.pdf
+  (a) final two-groove unit cell and dimensions; (b) n=-1,0,+1 Rayleigh topology;
+  (c) open/threshold channel count for opposite incidence signs; (d) strict point on the Rayleigh curve.
+
+fig2_pole_linewidth_q.pdf
+  (a) cached leaky pole approaching the n=-1 branch point; (b) local finite-model Q scaling;
+  (c) homogeneous strict open-channel zeros with finite exterior-energy/square-integrability audit;
+  (d) fixed-geometry versus reoptimized convergence.
+
+fig3_scattering_fields.pdf
+  (a,b) cached angle-frequency eta maps with Rayleigh threshold; (c) five fixed-angle cuts;
+  (d) cached driven pressure field at the practical Rayleigh route point.
+
+fig4_cancellation_tolerance.pdf
+  (a) two-cavity geometry; (b,c) complex radiation phasor cancellation for A0 and A-1;
+  (d) single-cavity ablation; (e) dimensions and 1 mm bound; (f) cached fixed-root tolerance map.
+
+fig5_routing_device.pdf
+  (a) reciprocal signed-order routing; (b) power-normalized S matrices; (c) reciprocity/energy no-go audit;
+  (d) strict BIC, near-RA route, and separate off-Rayleigh point; (e,f) off-Rayleigh convergence and spectrum.
+  The off-Rayleigh point is labeled as not BIC-enhanced. No experimental panels are included.
+
+figS1_experiment_protocol.pdf
+  (a) proposed tank geometry; (b) proposed scan sequence; (c) proposed complex-field to Floquet extraction;
+  (d) proposed ring-down check. All panels are schematics/theory plans; no experimental data are shown.
+
+figS2_controls_tolerance.pdf
+  (a) proposed full/single/blocked-cavity controls; (b) proposed M=20/40/60 finite-size plan;
+  (c) cached theory-only tolerance prediction; (d) theory-only sound-speed prediction.
+
+Pole diagnostics: cached finite-point local finite-model log-log fit gives Q slope approximately -1.9946.

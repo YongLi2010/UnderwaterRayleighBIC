@@ -1,0 +1,6 @@
+Final geometry full operator with direct kappa/Omega and target ky=0
+full raw residual evaluated on strict z=1.3765667768908454e-13
+full scaled residual on strict z=3.1637235942536542e-15
+full operator sigma_rel=7.7151137924043506e-16 smin=1.2909596960247917e-15 smax=1.6732866562457724
+target ky=0+0i
+strict reduced sigma_rel=1.2603643174303456e-15 raw=1.3765667611238457e-13

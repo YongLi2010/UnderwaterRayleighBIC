@@ -1,0 +1,3 @@
+system,n_cavities,N,K_per_cavity,kappa,Omega,sigma_ratio,raw_residual,transverse_fraction,search_bound_note
+single_rectangular,1,221,44,0.04,0.96,0.124588196790571,1.48399225409814,0.961341295749518,cached broad single-groove search; see report
+two_groove_nominal,2,313,39,0.0838486965529006,0.916151303447099,1.26036431743035e-15,1.37656676112385e-13,0.948423915775771,current two-groove strict root; normalized a=1

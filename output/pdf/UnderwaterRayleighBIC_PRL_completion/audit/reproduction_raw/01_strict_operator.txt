@@ -1,0 +1,17 @@
+CACHED FILE: StrictRayleighBIC_200kHz_min1mm.mat
+xFinal=[ 0.08384869655290064 0.6609415082450952 0.1572637319772332 0.5770182493155424 0.1532567942686195 0.1348624782079192 ]
+Omega=0.9161513034470994 theta=5.251216456430976 deg
+cfg dimensions normalized: a=1 lambda=1.09152276074641 depths=[0.6609415082450952 0.1572637319772332] widths=[0.5770182493155424 0.1532567942686195] gap=0.1348624782079192
+strict Rayleigh operator: target n=-1, removed n=[-1 0], size 391 x 389, sigma ratio 1.260e-15, raw residual 1.377e-13
+  finite-open power 0.000e+00, threshold amplitude 0.000e+00, groove proxy 0.948
+strict fields: size Ffull=391x391 Fred=removed_orders=-1 0 
+threshold_orders= 
+finite_open_orders=-1 0 
+retained_orders count=311
+sigma_rel=1.2603643174303456e-15 raw=1.3765667611238457e-13 full=1.3765667611238457e-13 scaled=2.9810546977697349e-15 consistency=0.0052382038212819108
+target amp=0+0i threshold norm=0 finite-open power=0 groove_frac=0.94842391577577101
+max A removed=0
+positive A orders -1,0,+1: [ 0+0i -0.26092556723024934+0i 0+0.23701341906568918i ]
+strict Rayleigh operator: target n=1, removed n=[0 1], size 391 x 389, sigma ratio 1.201e-15, raw residual 1.105e-13
+  finite-open power 0.000e+00, threshold amplitude 0.000e+00, groove proxy 0.948
+negative partner theta=-5.251216456430976 removed_orders=0 1  sigma_rel=1.2012864496637389e-15 raw=1.1052413003150023e-13 threshold_norm=0 finite_power=0

@@ -1,0 +1,15 @@
+# macOS and editor metadata
+.DS_Store
+**/.DS_Store
+*.asv
+*.autosave
+
+# Temporary working directories
+tmp/
+
+# Oversized/reproducible numerical cache exceeding GitHub's 100 MB limit
+/Ni2019_MATLAB/results/ThreeGrooveDoubleRayleighBIC_min0p7mm.mat
+
+# Large reproducible raster exports; PDF/SVG/PNG counterparts are retained
+*.tif
+*.tiff

@@ -1,0 +1,19 @@
+Exact-final-geometry pole continuation rerun
+kappa0=0.083848696552900642 Omega0=0.91615130344709939 theta=5.251216456430976 cfg depths widths gap= 0.66094150824509523 0.15726373197723323 0.57701824931554235 0.15325679426861946 0.13486247820791922
+Independent leaky-pole to Rayleigh tracking
+  start delta_kappa = -3.000000e-03, kappa = 0.080848696553
+  selected nonzero seed q = +0.000000e+00-3.286335e-02i
+  start pole q = -1.780574475422e-07-7.830995123588e-02i, Omega = +9.158092979250e-01+1.522551699989e-08i
+  start sigma_min/sigma_max = 1.461e-13; groove content = 0.855083
+  start finite-channel radiation fraction = 3.637e-07
+  endpoint Omega0 = 0.916151303447; endpoint sigma_min/sigma_max = 4.095e-04
+  endpoint finite-channel radiation fraction = 2.540e-07
+  final continued q = -1.453808858684e-08-1.309814397951e-02i; |q| = 1.310e-02
+  final continued Omega = +9.160676681109e-01+2.078688989100e-10i; |Omega-Omega0| = 8.364e-05
+  min consecutive right-mode overlap = 0.999996
+  max consecutive right-mode jump flag = 0
+  same nontrivial branch reaches endpoint = 1
+same_branch=1 warning=0 q_to_zero=0.01309814397952082 Omega_to_endpoint=8.3635336178758599e-05
+finite Q min=30074817.752703264 max=5414753757442.1816
+{Array indices must be positive integers or logical values.
+} 

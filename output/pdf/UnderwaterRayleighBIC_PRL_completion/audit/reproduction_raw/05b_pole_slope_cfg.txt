@@ -1,0 +1,17 @@
+P0.cfg=
+                   a: 1
+              lambda: 1.0916
+         theta_i_deg: 5.2575
+              depths: [0.6607 0.1572]
+              widths: [0.5771 0.1533]
+                gaps: 0.1348
+                   N: 121
+                   K: 15
+    solve_scattering: 0
+
+P0.fitQ=   -1.9961    5.3511
+
+P0.practicalQ=   2.0265e+12
+
+{Array indices must be positive integers or logical values.
+} 

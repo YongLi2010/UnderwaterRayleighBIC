@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="180mm" height="62.4mm" viewBox="0 0 1500 520" role="img" aria-label="From conventional BIC to Rayleigh BIC">
+<defs>
+<style><![CDATA[
+text{font-family:Arial,Helvetica,sans-serif;fill:#20242a}.panel{font-size:31px;font-weight:700}.title{font-size:25px;font-weight:600;letter-spacing:.2px}.label{font-size:21px;font-weight:500}.small{font-size:18px;font-weight:500}.math{font-family:Arial,Helvetica,sans-serif;font-size:22px;font-style:italic}.hair{stroke:#cfd7de;stroke-width:2;fill:none;vector-effect:non-scaling-stroke}.wave{stroke:#d5e1e9;stroke-width:3;fill:none;vector-effect:non-scaling-stroke}.cyan{stroke:#3698ad;stroke-width:5;fill:none;vector-effect:non-scaling-stroke}.violet{stroke:#8065a8;stroke-width:5;fill:none;vector-effect:non-scaling-stroke}.orange{stroke:#d87923;stroke-width:5;fill:none;vector-effect:non-scaling-stroke}.zero{stroke:#ce3d32;stroke-width:5;fill:none;stroke-linecap:round;vector-effect:non-scaling-stroke}
+]]></style>
+<radialGradient id="modeA"><stop offset="0" stop-color="#735aa2" stop-opacity=".82"/><stop offset=".38" stop-color="#5d93b6" stop-opacity=".48"/><stop offset="1" stop-color="#dcebf2" stop-opacity="0"/></radialGradient>
+<radialGradient id="modeC"><stop offset="0" stop-color="#ce3d32" stop-opacity=".72"/><stop offset=".28" stop-color="#8065a8" stop-opacity=".48"/><stop offset=".68" stop-color="#3698ad" stop-opacity=".20"/><stop offset="1" stop-color="#dcebf2" stop-opacity="0"/></radialGradient>
+<linearGradient id="grazing"><stop offset="0" stop-color="#d87923" stop-opacity="0"/><stop offset=".17" stop-color="#d87923" stop-opacity=".16"/><stop offset=".5" stop-color="#d87923" stop-opacity=".27"/><stop offset=".83" stop-color="#d87923" stop-opacity=".16"/><stop offset="1" stop-color="#d87923" stop-opacity="0"/></linearGradient>
+<marker id="arrowCyan" viewBox="0 0 10 10" refX="8.6" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5 0 10z" fill="#3698ad"/></marker>
+<marker id="arrowViolet" viewBox="0 0 10 10" refX="8.6" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5 0 10z" fill="#8065a8"/></marker>
+<marker id="arrowOrange" viewBox="0 0 10 10" refX="8.6" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5 0 10z" fill="#d87923"/></marker>
+<clipPath id="clipA"><rect x="20" y="20" width="460" height="480"/></clipPath><clipPath id="clipB"><rect x="520" y="20" width="460" height="480"/></clipPath><clipPath id="clipC"><rect x="1020" y="20" width="460" height="480"/></clipPath>
+</defs>
+<rect width="1500" height="520" fill="#fff"/><path d="M500 40V480M1000 40V480" stroke="#e7ebee" stroke-width="2"/>
+
+<!-- a: conventional BIC -->
+<g clip-path="url(#clipA)">
+<text x="36" y="53" class="panel">a</text><text x="250" y="55" text-anchor="middle" class="title">Conventional BIC</text>
+<path d="M45 168C118 147 180 189 250 168S383 189 455 168" class="wave"/><path d="M45 226C118 205 180 247 250 226S383 247 455 226" class="wave"/><path d="M45 292C118 271 180 313 250 292S383 313 455 292" class="wave"/><path d="M45 358C118 337 180 379 250 358S383 379 455 358" class="wave"/>
+<ellipse cx="250" cy="304" rx="135" ry="93" fill="url(#modeA)"/><ellipse cx="250" cy="304" rx="91" ry="61" fill="none" stroke="#527f9c" stroke-width="3" opacity=".72"/><ellipse cx="250" cy="304" rx="54" ry="35" fill="none" stroke="#735aa2" stroke-width="4" opacity=".82"/>
+<path d="M197 272C173 223 190 173 237 151" class="cyan" marker-end="url(#arrowCyan)"/><path d="M303 272C327 223 310 173 263 151" class="violet" marker-end="url(#arrowViolet)"/><path d="M240 140L260 160M260 140L240 160" class="zero"/>
+<text x="250" y="116" text-anchor="middle" class="math">A<tspan baseline-shift="sub" font-size="15">rad</tspan> = 0</text><text x="250" y="445" text-anchor="middle" class="small" fill="#53616c">localized</text>
+</g>
+
+<!-- b: Rayleigh anomaly -->
+<g clip-path="url(#clipB)">
+<text x="536" y="53" class="panel">b</text><text x="750" y="55" text-anchor="middle" class="title">Rayleigh anomaly</text>
+<rect x="515" y="202" width="470" height="104" fill="url(#grazing)"/><path d="M512 232C570 211 628 253 686 232S802 253 860 232S962 238 990 228" class="orange" opacity=".52"/><path d="M512 273C570 252 628 294 686 273S802 294 860 273S962 279 990 269" class="orange" opacity=".92" marker-end="url(#arrowOrange)"/>
+<text x="750" y="152" text-anchor="middle" class="math">k<tspan baseline-shift="sub" font-size="15">y</tspan> = 0</text><text x="886" y="198" text-anchor="middle" class="math" fill="#b65e18">A<tspan baseline-shift="sub" font-size="15">RA</tspan> ≠ 0</text>
+<path d="M750 380V321" class="hair" marker-end="url(#arrowCyan)"/><path d="M740 315L760 335M760 315L740 335" class="zero"/><text x="778" y="352" class="math">J<tspan baseline-shift="sub" font-size="15">y</tspan> = 0</text>
+<g fill="#7f8a93"><rect x="533" y="394" width="18" height="8" rx="4"/><rect x="574" y="394" width="18" height="8" rx="4"/><rect x="615" y="394" width="18" height="8" rx="4"/><rect x="656" y="394" width="18" height="8" rx="4"/><rect x="697" y="394" width="18" height="8" rx="4"/><rect x="738" y="394" width="18" height="8" rx="4"/><rect x="779" y="394" width="18" height="8" rx="4"/><rect x="820" y="394" width="18" height="8" rx="4"/><rect x="861" y="394" width="18" height="8" rx="4"/><rect x="902" y="394" width="18" height="8" rx="4"/><rect x="943" y="394" width="18" height="8" rx="4"/></g>
+<text x="750" y="462" text-anchor="middle" class="label" fill="#ce3d32">zero flux ≠ localized</text>
+</g>
+
+<!-- c: Rayleigh BIC -->
+<g clip-path="url(#clipC)">
+<text x="1036" y="53" class="panel">c</text><text x="1250" y="55" text-anchor="middle" class="title">Rayleigh BIC</text>
+<ellipse cx="1242" cy="320" rx="141" ry="96" fill="url(#modeC)"/><ellipse cx="1242" cy="320" rx="94" ry="61" fill="none" stroke="#4e91a4" stroke-width="3" opacity=".58"/><ellipse cx="1242" cy="320" rx="57" ry="36" fill="none" stroke="#8065a8" stroke-width="4" opacity=".78"/>
+<path d="M1202 282C1174 238 1188 194 1228 170" class="cyan" marker-end="url(#arrowCyan)"/><path d="M1282 282C1310 238 1296 194 1256 170" class="violet" marker-end="url(#arrowViolet)"/><path d="M1232 158L1252 178M1252 158L1232 178" class="zero"/><text x="1242" y="128" text-anchor="middle" class="math">A<tspan baseline-shift="sub" font-size="15">open</tspan> = 0</text>
+<path d="M1301 301C1342 272 1382 278 1411 307" class="cyan" marker-end="url(#arrowCyan)"/><path d="M1301 339C1342 368 1382 362 1411 333" class="violet" marker-end="url(#arrowViolet)"/><path d="M1411 310L1431 330M1431 310L1411 330" class="zero"/><text x="1394" y="258" text-anchor="middle" class="math">A<tspan baseline-shift="sub" font-size="15">RA</tspan> = 0</text>
+<g fill="#7f8a93" opacity=".72"><rect x="1038" y="419" width="18" height="8" rx="4"/><rect x="1079" y="419" width="18" height="8" rx="4"/><rect x="1120" y="419" width="18" height="8" rx="4"/><rect x="1161" y="419" width="18" height="8" rx="4"/><rect x="1202" y="419" width="18" height="8" rx="4"/><rect x="1243" y="419" width="18" height="8" rx="4"/><rect x="1284" y="419" width="18" height="8" rx="4"/><rect x="1325" y="419" width="18" height="8" rx="4"/><rect x="1366" y="419" width="18" height="8" rx="4"/><rect x="1407" y="419" width="18" height="8" rx="4"/><rect x="1448" y="419" width="18" height="8" rx="4"/></g>
+<text x="1242" y="466" text-anchor="middle" class="label" fill="#53616c">localized at the channel opening</text>
+</g>
+</svg>

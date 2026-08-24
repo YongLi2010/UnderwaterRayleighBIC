@@ -1,0 +1,19 @@
+Cached-config pole continuation rerun
+kappa0=0.083940636848795894 Omega0=0.91605936315120406 theta=5.2575197347042231 N=121 K=15
+Independent leaky-pole to Rayleigh tracking
+  start delta_kappa = -3.000000e-03, kappa = 0.080940636849
+  selected nonzero seed q = +0.000000e+00-3.286335e-02i
+  start pole q = -2.316727258955e-07-7.733462202287e-02i, Omega = +9.157999067660e-01+1.956357776166e-08i
+  start sigma_min/sigma_max = 1.240e-13; groove content = 0.855134
+  start finite-channel radiation fraction = 4.664e-07
+  endpoint Omega0 = 0.916059363151; endpoint sigma_min/sigma_max = 7.032e-17
+  endpoint finite-channel radiation fraction = 3.995e-32
+  final continued q = -4.642171288986e-11-4.460057760396e-03i; |q| = 4.460e-03
+  final continued Omega = +9.160585057675e-01+2.260156087431e-13i; |Omega-Omega0| = 8.574e-07
+  min consecutive right-mode overlap = 0.999996
+  max consecutive right-mode jump flag = 0
+  same nontrivial branch reaches endpoint = 1
+same_branch=1 warning=0 q_to_zero=0.0044600577603961591 Omega_to_endpoint=8.5738368116320052e-07
+finite Q min=23405736.87295391 max=2026538146772.0979 count=19
+{Array indices must be positive integers or logical values.
+} 

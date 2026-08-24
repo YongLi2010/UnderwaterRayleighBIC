@@ -1,0 +1,5 @@
+KyTolerance=4.9999999999999998e-08 target_is_rayleigh=0 threshold=  finite=-1 0  sigma=1.2603643174303456e-15 raw=1.3765667611238457e-13 targetAmp=0.000e+00
+KyTolerance=5.7563484089722421e-08 target_is_rayleigh=0 threshold=  finite=-1 0  sigma=1.2603643174303456e-15 raw=1.3765667611238457e-13 targetAmp=0.000e+00
+KyTolerance=9.9999999999999995e-08 target_is_rayleigh=0 threshold=  finite=-1 0  sigma=1.2603643174303456e-15 raw=1.3765667611238457e-13 targetAmp=0.000e+00
+KyTolerance=9.9999999999999995e-07 target_is_rayleigh=1 threshold=-1  finite=0  sigma=1.2603643174303456e-15 raw=1.3765667611238457e-13 targetAmp=0.000e+00
+KyTolerance=1.0000000000000001e-05 target_is_rayleigh=1 threshold=-1  finite=0  sigma=1.2603643174303456e-15 raw=1.3765667611238457e-13 targetAmp=0.000e+00

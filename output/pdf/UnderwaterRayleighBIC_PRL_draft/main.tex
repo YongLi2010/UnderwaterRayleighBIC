@@ -1,0 +1,252 @@
+% !TEX program = pdflatex
+% PRL-style theory manuscript.  Vector figures are supplied in figures/.
+\documentclass[aps,prl,reprint,superscriptaddress,nofootinbib]{revtex4-2}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage[hidelinks]{hyperref}
+
+\hypersetup{
+  pdftitle={A strict Rayleigh bound state in the continuum in a two-groove underwater acoustic metagrating},
+  pdfauthor={Author names to be inserted},
+  pdfsubject={Theory of acoustic Rayleigh bound states in the continuum}
+}
+
+\newcommand{\dd}{\,\mathrm{d}}
+\newcommand{\ii}{\,\mathrm{i}}
+\newcommand{\e}{\,\mathrm{e}}
+\newcommand{\vect}[1]{\bm{#1}}
+\newcommand{\BIC}{\mathrm{BIC}}
+\newcommand{\RA}{\mathrm{RA}}
+\providecommand{\dr}{\mathrm{dr}}
+\providecommand{\hom}{\mathrm{hom}}
+\providecommand{\inc}{\mathrm{inc}}
+\newcommand{\figplaceholder}[2]{%
+  \IfFileExists{#1}{\includegraphics[width=\linewidth]{#1}}{%
+    \fbox{\begin{minipage}[c][0.28\textheight][c]{0.92\linewidth}
+      \centering\small
+      \textit{Vector figure supplied separately}\par\vspace{0.5ex}
+      \texttt{\detokenize{#1}}\par\vspace{0.8ex}
+      #2
+    \end{minipage}}}}
+
+\begin{document}
+\title{A strict Rayleigh bound state in the continuum in a two-groove underwater acoustic metagrating}
+\author{Author Name}
+\affiliation{Affiliation to be inserted}
+\author{Coauthor Name}
+\affiliation{Affiliation to be inserted}
+\date{\today}
+
+\begin{abstract}
+A bound state in the continuum (BIC) is an embedded eigenstate whose coupling to every radiative channel vanishes.  We construct a single-Rayleigh BIC in a millimetre-scale underwater acoustic metagrating, with both groove widths constrained above $1$~mm, and resolve its reciprocal channel signature.  A pole-free pressure--velocity modal operator is used for the homogeneous state, while driven scattering amplitudes are computed independently.  At $200$~kHz in water, a two-groove cell of period $a=6.871135$~mm supports a state at $\theta=\pm5.251216^{\circ}$: at positive angle, $n=0$ propagates, $n=-1$ is exactly at the Rayleigh threshold, and $n=+1$ is evanescent.  The strict condition is $A_{-1}^{\hom}=A_0^{\hom}=0$; zero grazing flux alone does not make a square-integrable state.  At $(N,K)=(313,39)$, the relative singular-value ratio is $1.26\times10^{-15}$ and the raw residual is $1.38\times10^{-13}$.  Complex-pole continuation shows a local finite-model $Q$ trend close to quadratic, without implying a universal exponent.  A two-cavity phase degree of freedom is required within the searched rectangular family.  Under drive, reversal of $\theta$ exchanges signed anomalous orders while preserving reciprocity and unitarity.  A separate off-Rayleigh state reaches $99.96\%$ anomalous efficiency; it is not BIC-enhanced.
+\end{abstract}
+
+\maketitle
+
+A bound state in the continuum is a normal-direction-localized Bloch eigenstate whose real frequency lies in a spectrum of radiating waves.  Its defining property is the exact decoupling of a homogeneous eigenmode from every channel that carries energy to infinity, rather than a minimum in driven reflectance.  This distinction underlies the BIC literature in photonic crystals, metasurfaces, and periodic waveguides \cite{Hsu2016BIC,Koshelev2023Review,Azzam2021Review,Yang2014Analytical,Zhen2014Topological}.  Symmetry protection and accidental destructive interference are the familiar limits, with pole trajectories that can approach the real-frequency axis with large quality factors \cite{Hsu2013Observation,Sadrieva2017LeakyResonances,Abdrabou2022FrequencyPerturbation}.
+
+A Rayleigh anomaly changes the radiation bookkeeping.  At the opening of a Floquet channel, its normal wavenumber vanishes and its normal flux is zero even when the pressure amplitude is finite.  The corresponding field is constant in the normal direction and is not square integrable.  A strict BIC at the threshold must therefore cancel the threshold amplitude itself in addition to every finite-flux open amplitude.  This threshold behavior is part of the general singular structure of scattering matrices at channel openings \cite{Rayleigh1907,Wojcik2021ThresholdScattering}.
+
+Acoustic metagratings supply independently tunable groove resonances with a compact geometry \cite{Assouar2018AcousticMetasurfaces,Ni2019Splitter,Torrent2018Anomalous,Jin2019Grating}.  Waterborne gratings have demonstrated anomalous and negative-order reflection \cite{Bernard2022NegativeReflection,Fan2021Multifunctional,Cao2024UnderwaterAbnormal}, while underwater resonators and phononic crystals have exhibited high-$Q$ or merged BIC behavior \cite{Farhat2024UltrahighQ,Yang2024MergedFP}.  The electromagnetic Rayleigh-BIC formulation recently emphasized the collision of a resonant pole with a diffraction threshold \cite{Karavaev2026Rayleigh}; here we apply that pole-and-channel viewpoint to a rigid acoustic grating and test the threshold amplitude directly.  The result is a constructive two-cavity state, a bounded single-cavity ablation within the searched family, and a reciprocal signed-order router.
+
+Consider a sound-hard surface periodic in $x$ with period $a$, immersed in water occupying $y>0$.  With time dependence $\e^{+\ii\omega t}$, a unit-amplitude incident wave and the outgoing reflected field are
+\begin{equation}
+ k_0=\frac{\omega}{c},\qquad k_{x,\inc}=k_0\sin\theta,\qquad
+ k_{y,\inc}=k_0\cos\theta,
+ \label{eq:incident-wavenumbers}
+\end{equation}
+\begin{equation}
+\begin{aligned}
+ p_{\inc}&=\e^{\ii(k_{x,\inc}x+k_{y,\inc}y)},\\
+ p_{\mathrm{sc}}&=\sum_{n\in\mathbb Z}A_n^{\dr}
+ \e^{\ii k_{x,n}x-\ii k_{y,n}y},\qquad
+ k_{x,n}=k_{x,\inc}+\frac{2\pi n}{a}.
+\end{aligned}
+\label{eq:floquet-expansion}
+\end{equation}
+where $k_{y,n}=\sqrt{k_0^2-k_{x,n}^2}$ is taken on the outgoing/decaying branch, $\Re k_{y,n}\geq0$, $\Im k_{y,n}\leq0$.  In dimensionless form,
+\begin{equation}
+\begin{aligned}
+ \Omega&=\frac{af}{c},\qquad
+ \kappa=\frac{ak_{x,\inc}}{2\pi}=\Omega\sin\theta,\\
+ k_{y,n}&=0\ \Longleftrightarrow\ |\kappa+n|=\Omega .
+\end{aligned}
+\label{eq:rayleigh-condition}
+\end{equation}
+The superscript $\dr$ distinguishes driven amplitudes, which contain the rigid-background reflection, from the homogeneous amplitudes used below.
+
+Inside each rectangular groove we use bottom-rigid cosine modes.  Projection of pressure and normal-velocity continuity onto these modes and the exterior Floquet basis gives a pole-free homogeneous system
+\begin{equation}
+\begin{aligned}
+ \mathsf F(\omega,\kappa;\boldsymbol g)
+ \begin{bmatrix}\vect A^{\hom}\\ \vect C\end{bmatrix}&=0,\\
+ \boldsymbol g&=(d_1,d_2,w_1,w_2,g).
+\end{aligned}
+\label{eq:homogeneous-system}
+\end{equation}
+with the groove coefficients $\vect C$ retained rather than eliminated through tangent functions.  The full projections, block matrix, and driven reduction are given in the Supplemental Material.  The driven calculation is written abstractly as $\mathsf M\vect A^{\dr}=\vect b$ and is used only to evaluate scattering.  For a propagating order,
+\begin{equation}
+ \eta_n=\frac{\Re k_{y,n}}{k_{y,\inc}}
+ \left|\frac{A_n^{\dr}}{A_{\inc}}\right|^2,
+ \qquad A_{\inc}=1,
+ \label{eq:efficiency}
+\end{equation}
+with $\sum_{n\in\mathrm{prop}}\eta_n=1$ for the lossless modal calculation up to truncation error.
+
+The threshold condition must be imposed on the homogeneous field.  For one exterior harmonic $p_n^{\hom}=A_n^{\hom}\e^{\ii k_{x,n}x-\ii k_{y,n}y}$, a threshold order has
+\begin{equation}
+ k_{y,n}=0,\qquad \int_0^H|p_n^{\hom}|^2\dd y=H|A_n^{\hom}|^2,
+ \label{eq:threshold-norm}
+\end{equation}
+whereas an evanescent order with $k_{y,n}=-\ii\alpha_n$ has a finite norm $|A_n^{\hom}|^2/(2\alpha_n)$.  Thus zero grazing flux is insufficient: square integrability requires
+\begin{equation}
+\begin{aligned}
+ A_n^{\hom}&=0\quad\text{for each finite-flux open order},\\
+ A_{n_{\RA}}^{\hom}&=0\quad\text{at the selected threshold}.
+\end{aligned}
+\label{eq:strict-zero}
+\end{equation}
+This is a condition on the homogeneous eigenproblem, not on a driven reflection dip.  For the positive-angle state below it becomes $A_{-1}^{\hom}=A_0^{\hom}=0$.
+
+We target $f_0=200$~kHz in water with $c=1500$~m/s.  The optimized two-groove unit cell is
+\begin{equation}
+\begin{aligned}
+ a&=6.871135~\mathrm{mm},& g&=0.926658~\mathrm{mm},\\
+ d_1&=4.541418~\mathrm{mm},& d_2&=1.080580~\mathrm{mm},\\
+ w_1&=3.964770~\mathrm{mm},& w_2&=1.053048~\mathrm{mm}.
+\end{aligned}
+\label{eq:dimensional-design}
+\end{equation}
+At the BIC,
+\begin{equation}
+\begin{aligned}
+ \kappa_{\BIC}&=0.083848696553,\qquad
+ \Omega_{\BIC}=0.916151303447,\\
+ \theta_{\BIC}&=\pm5.251216^{\circ}.
+\end{aligned}
+\label{eq:bic-coordinate}
+\end{equation}
+so $\kappa_{\BIC}+\Omega_{\BIC}=1$ and the $n=-1$ order is at the RA for positive angle.  The negative-angle point is its order-reversed partner.
+
+\begin{figure*}[t]
+  \centering
+  \figplaceholder{figures/fig1_structure_topology.pdf}{Unit cell, Rayleigh lines, and signed-order channel topology.}
+  \caption{\label{fig:structure}
+  Unit cell and single-Rayleigh topology.  (a) The two straight-walled
+  grooves and dimensions specified by Eq.~\eqref{eq:dimensional-design}.
+  (b) Rayleigh curves for $n=-1,0,+1$ in the $(\kappa,\Omega)$ plane.
+  (c) The open, threshold, and evanescent channel counts for the two
+  incidence signs.  (d) The converged design point on the $n=-1$ Rayleigh
+  curve.  This is a theoretical channel map.}
+\end{figure*}
+
+At positive angle, the strict radiation-reduced operator deletes $A_{-1}^{\hom}$ and $A_0^{\hom}$ from its unknown vector and reinserts them as exact zeros after the smallest right singular vector is reconstructed.  At $(N,K)=(313,39)$, with $N$ exterior orders and $K$ cosine modes per groove, the scaled and unscaled diagnostics are
+\begin{equation}
+ \frac{\sigma_{\min}}{\sigma_{\max}}=1.2604\times10^{-15},
+ \qquad r_{\mathrm{raw}}=1.3766\times10^{-13}.
+ \label{eq:strict-diagnostics}
+\end{equation}
+The exterior norm is finite because all finite-flux open amplitudes and the threshold pressure have been removed; the retained orders are evanescent.  At negative angle, the same construction removes $A_{+1}^{\hom}$ and $A_0^{\hom}$.
+
+A real-axis null is further tested by continuing the homogeneous operator to complex frequency on the selected outgoing sheet.  For a pole $\omega_p$,
+\begin{equation}
+ Q=\frac{\Re\omega_p}{2|\Im\omega_p|}.
+ \label{eq:complex-q}
+\end{equation}
+The trajectory approaches the Rayleigh point as the radiative residue collapses; the nearest finite value in the continuation is approximately $2\times10^{12}$.  The $(N,K)=(121,15)$ continuation gives an approximately quadratic local trend, $Q\propto|\Delta\kappa|^{-2.00}$.  This is a finite-model diagnostic only, not a universal exponent or an extrapolation beyond resolved precision.
+
+\begin{figure*}[t]
+  \centering
+  \figplaceholder{figures/fig2_pole_linewidth_q.pdf}{Strict null, pole continuation, and finite-truncation convergence.}
+  \caption{\label{fig:bic-pole}
+  Pole and strict-null evidence.  (a) The cached leaky pole approaches the
+  selected $n=-1$ branch point.  (b) The linewidth and $Q$ follow the local
+  near-quadratic trend.  (c) The homogeneous open-channel amplitudes vanish
+  at the strict root.  (d) Fixed-geometry and reoptimized truncation checks
+  distinguish numerical convergence from the pole fit.  The near-$-2$
+  slope is the local $(N,K)=(121,15)$ finite-model trend; no universal
+  asymptotic law is asserted.}
+\end{figure*}
+
+Driven fields are not the dark eigenfield.  Near the pole, $A_n^{\dr}$ and the groove coefficients may be large or phase sensitive, whereas $A_n^{\hom}$ obeys Eq.~\eqref{eq:strict-zero}.  The separate field panels in Fig.~\ref{fig:fields} therefore label driven scattering coefficients and the normalized homogeneous eigenfield distinctly; a driven specular minimum is not evidence for $A_0^{\hom}=0$.
+
+\begin{figure*}[t]
+  \centering
+  \figplaceholder{figures/fig3_scattering_fields.pdf}{Driven scattering cuts and representative pressure/intensity fields.}
+  \caption{\label{fig:fields}
+  Driven scattering and field response.  (a,b) Angle--frequency maps of the
+  anomalous- and specular-order efficiencies, each with the Rayleigh threshold.  (c) Five
+  fixed-angle spectral cuts resolving the signed orders.  (d) The driven
+  pressure field at the practical Rayleigh-routing point.  The homogeneous
+  amplitudes are tested separately by the strict operator; no measured field
+  is included.}
+\end{figure*}
+
+The strict state imposes two complex radiation constraints at positive angle,
+\begin{equation}
+ A_m^{\hom}=\sum_{\ell=1}^{2}\sum_q
+ \mathcal R_{m,\ell q}(\omega,\kappa)C_{\ell q}=0,
+ \qquad m\in\{0,-1\}.
+ \label{eq:two-radiation-constraints}
+\end{equation}
+The $n=0$ row removes finite-flux radiation and the $n=-1$ row removes the non-square-integrable threshold field.  In this modal decomposition, the wide groove provides the dominant storage resonance, while the narrower groove supplies an independent aperture phase.  A single large rectangular groove with additional transverse modes reached a best complete residual of about $0.124$ in the searched family; this is a bounded ablation result, not a theorem for every one-cavity geometry.
+
+\begin{figure*}[t]
+  \centering
+  \figplaceholder{figures/fig4_cancellation_tolerance.pdf}{Ablation, radiation phasors, and dimensional sensitivity.}
+  \caption{\label{fig:two-cavity}
+  Two-cavity cancellation and sensitivity.  (a) The two-groove geometry.
+  (b,c) Complex radiation phasors closing separately for $A_0^{\hom}$ and
+  $A_{-1}^{\hom}$.  (d) The single-large-cavity ablation with additional
+  transverse modes.  (e) The dimensional values and millimetre-scale bound.
+  (f) The cached fixed-root tolerance map.  The single-cavity value near
+  $0.124$ is restricted to the searched family.}
+\end{figure*}
+
+A useful driven point lies slightly away from the BIC,
+\begin{equation}
+ \theta=\pm6.000^{\circ},\qquad f=200.216874~\mathrm{kHz}.
+ \label{eq:practical-router}
+\end{equation}
+For $+\theta$, $\eta_{-1}=0.30613$, $\eta_0=0.69387$, and $\theta_{\mathrm{out},-1}\simeq-80.34^{\circ}$; reversal gives $\eta_{+1}=0.30613$ and $\theta_{\mathrm{out},+1}\simeq+80.34^{\circ}$.  In the time-reversed power-normalized bases $(0,-1)$ for positive incidence and $(0,+1)$ for negative incidence, this signed-order exchange is required by
+\begin{equation}
+\begin{aligned}
+ \mathsf S_\pm^\dagger\mathsf S_\pm&=\mathsf I,\\
+ \mathsf S_+(\kappa)&=\mathsf S_-^{\mathsf T}(-\kappa),\\
+ \eta_{-1}(+\theta)&=\eta_{+1}(-\theta).
+\end{aligned}
+\label{eq:unitarity-reciprocity}
+\end{equation}
+so it is reciprocal routing, not isolation.  An ideal-limit point near $\theta=5.27044^{\circ}$ and $f=200.00578$~kHz reaches about $85.7\%$ in the lossless calculation but has $\operatorname{cond}\simeq1.6\times10^{10}$ and is not a robust operating prediction.
+
+The same geometry also has a distinct off-Rayleigh state,
+\begin{equation}
+ \theta=\pm32.6328^{\circ},\qquad f=202.430~\mathrm{kHz},
+ \label{eq:off-rayleigh-point}
+\end{equation}
+for which $(N,K)=(401,50)$ gives $\eta_{\mathrm{target}}=0.9996185$, $\eta_0=0.0003815$, and energy-closure error $4.4\times10^{-16}$.  The active $n=-1$ threshold is approximately $141.825$~kHz, so this $99.96\%$ state is an ordinary off-Rayleigh anomalous-reflection solution, not a BIC-enhanced or nonreciprocal effect.
+
+\begin{figure*}[t]
+  \centering
+  \figplaceholder{figures/fig5_routing_device.pdf}{Reciprocal signed-order routing and the distinct off-Rayleigh state.}
+  \caption{\label{fig:routing}
+  Same-cell driven states.  (a) Reciprocal signed-order routing near
+  $\pm6^{\circ}$.  (b) Power-normalized scattering matrices for the two
+  incidence signs.  (c) Reciprocity and energy-closure audit, showing the
+  no-isolator constraint.  (d) The strict BIC, near-Rayleigh route, and
+  separate off-Rayleigh point.  (e,f) Convergence and frequency spectrum of
+  the off-Rayleigh anomalous-reflection state.  The matrices and residuals
+  are theoretical predictions, not an experimental demonstration.}
+\end{figure*}
+
+The calculation establishes a constructive acoustic Rayleigh-threshold BIC: the pole reaches a diffraction opening while the threshold pressure and every finite-flux homogeneous coefficient vanish.  The decisive diagnostic is consequently stronger than zero normal flux.  The model assumes a rigid, lossless, nondispersive fluid and an infinite periodic surface; finite width, source aperture, fabrication tolerance, thermoviscous loss, fluid--structure compliance, and calibration are not included.  The near-BIC routing point is ill conditioned, the pole exponent is model-specific, and the off-Rayleigh efficiency is independent of the BIC.  A controlled water-tank validation with reciprocal signed-order measurements is reserved for a subsequent study.
+
+\bibliography{ref}
+
+\end{document}
