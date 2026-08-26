@@ -8,8 +8,6 @@ from matplotlib.patches import Rectangle, Polygon, Circle
 
 ROOT = Path(__file__).resolve().parents[1]
 POLE = ROOT / "Ni2019_MATLAB" / "results" / "fig4_wideangle_180k"
-SCAT = (ROOT / "Ni2019_MATLAB" / "results"
-        / "fig4_experimental_observables_180k")
 OUT = ROOT / "figures" / "comsol_numerical_experiment"
 OUT.mkdir(parents=True, exist_ok=True)
 
@@ -99,7 +97,6 @@ def spectral_model(pole):
 
 
 pole = read_csv(POLE / "wideangle_physical_pole.csv")
-radiation = read_csv(SCAT / "pole_and_radiation_summary.csv")
 (theta, frequency, ideal_map, gaussian_maps, angular_bandwidths,
  waist_grid, eigen_width, pole_frequency) = spectral_model(pole)
 
@@ -128,18 +125,20 @@ with open(OUT / "Fig5_minimum_width_vs_waist.csv", "w", newline="") as handle:
 
 # Figure contract: a finite beam cannot itself realize the single-k BIC limit;
 # its known angular spectrum permits a controlled extrapolation to that limit.
-fig = plt.figure(figsize=(7.2047244, 7.15))
-outer = fig.add_gridspec(3, 1, height_ratios=[0.78, 1.06, 0.88], hspace=0.47)
+# The former homogeneous A0/A-1 panel was removed deliberately: those zeros are
+# already the central eigenproblem evidence in Fig. 2 and the CMT mechanism in
+# Fig. 3.  Fig. 5 is now exclusively the finite-beam observability story.
+fig = plt.figure(figsize=(7.2047244, 6.45))
+outer = fig.add_gridspec(3, 1, height_ratios=[0.78, 1.10, 0.92], hspace=0.50)
 top = outer[0].subgridspec(1, 2, width_ratios=[1.18, 0.82], wspace=0.28)
 middle = outer[1].subgridspec(1, 2, wspace=0.16)
-bottom = outer[2].subgridspec(1, 3, wspace=0.40)
+bottom = outer[2].subgridspec(1, 2, width_ratios=[1.0, 1.0], wspace=0.32)
 ax_a = fig.add_subplot(top[0, 0])
 ax_b = fig.add_subplot(top[0, 1])
 ax_c = fig.add_subplot(middle[0, 0])
 ax_d = fig.add_subplot(middle[0, 1])
 ax_e = fig.add_subplot(bottom[0, 0])
 ax_f = fig.add_subplot(bottom[0, 1])
-ax_g = fig.add_subplot(bottom[0, 2])
 
 # a, measurement and k-space recovery principle.
 ax_a.set(xlim=(0, 1), ylim=(0, 1))
@@ -156,7 +155,7 @@ for xg in np.linspace(sample_left, sample_right - cell_width, 20):
     ax_a.add_patch(Rectangle((xg + 0.68 * cell_width, sample_y - 0.025),
                              0.13 * cell_width, 0.025,
                              facecolor="white", edgecolor="none"))
-ax_a.text(0.37, 0.085, r"20 periods ($20a=148.4$ mm)", ha="center")
+ax_a.text(0.37, 0.035, r"20 periods ($20a=148.4$ mm)", ha="center")
 source_l, source_r, source_y = 0.20, 0.56, 0.87
 ax_a.plot([source_l, source_r], [source_y, source_y], color=ORANGE,
           lw=4.0, solid_capstyle="butt")
@@ -209,6 +208,7 @@ ax_b.axvline(0, color=LIGHT, lw=0.7)
 ax_b.set(xlabel=r"Angular offset, $\Delta\theta$ (deg)",
          ylabel="Incident intensity", xlim=(-10, 10), ylim=(0, 1.04),
          yticks=[0, 0.5, 1])
+ax_b.set_title("Angular spectrum of the finite source", pad=3)
 ax_b.legend(title="Waist (angular FWHM)", loc="upper right",
             handlelength=1.3, title_fontsize=7.2)
 ax_b.text(-9.6, 0.87, "current", color=ORANGE, fontsize=7,
@@ -237,53 +237,42 @@ cbar = fig.colorbar(image, ax=[ax_c, ax_d], fraction=0.022, pad=0.012,
                     ticks=[-6, -3, 0])
 cbar.set_label(r"Pole spectral density, $\log_{10}\mathcal{L}$")
 
-# e, the intrinsic simultaneous closure of both homogeneous channels.
-ax_e.semilogy(radiation["theta_deg"],
-              np.maximum(radiation["radiation_A0"], 1e-17),
-              color=BLUE, label=r"$|A_0|$")
-ax_e.semilogy(radiation["theta_deg"],
-              np.maximum(radiation["radiation_Am1"], 1e-17),
-              color=ORANGE, label=r"$|A_{-1}|$")
-ax_e.axvline(THETA_BIC, color=LIGHT, lw=0.7)
-ax_e.set(xlabel=r"$\theta$ (deg)", ylabel="Eigenmode radiation",
-         xlim=(7.099, 8.52), ylim=(1e-17, 1e-2),
-         xticks=[7.1, 7.5, 8.0, 8.5])
-ax_e.legend(loc="lower right", handlelength=1.3)
-
-# f, intrinsic linewidth versus the angular-dispersion resolution floor.
-ax_f.semilogy(theta, np.maximum(eigen_width, 1e-8), color=DARK,
+# e, intrinsic linewidth versus the angular-dispersion resolution floor.
+ax_e.set_title("Intrinsic width versus finite-beam floor", pad=3)
+ax_e.semilogy(theta, np.maximum(eigen_width, 1e-8), color=DARK,
               label="Bloch pole")
 for waist in [25., 100., 200.]:
-    ax_f.semilogy(theta, angular_bandwidths[waist],
+    ax_e.semilogy(theta, angular_bandwidths[waist],
                   color=beam_colors[waist], label=rf"$w={int(waist)}$ mm")
-ax_f.axvline(THETA_BIC, color=LIGHT, lw=0.7)
-ax_f.set(xlabel=r"Central angle, $\theta$ (deg)",
+ax_e.axvline(THETA_BIC, color=LIGHT, lw=0.7)
+ax_e.set(xlabel=r"Central angle, $\theta$ (deg)",
          ylabel="Spectral width (Hz)", xlim=(5.8, 8.5), ylim=(1e-8, 3e3))
-ax_f.legend(loc="lower left", handlelength=1.2)
+ax_e.legend(loc="lower left", handlelength=1.2)
 
-# g, experimentally actionable aperture/waist scaling.
+# f, experimentally actionable aperture/waist scaling.
 minimum_width = np.array([np.nanmin(angular_bandwidths[w]) for w in waist_grid])
-ax_g.loglog(waist_grid, minimum_width, "o-", color=BLUE,
+ax_f.set_title("Waist sets the resolution floor", pad=3)
+ax_f.loglog(waist_grid, minimum_width, "o-", color=BLUE,
             ms=3.5, mfc="white", mec=BLUE, mew=0.8)
-ax_g.plot(25, minimum_width[0], "o", color=ORANGE, ms=5, zorder=3)
-ax_g.annotate("current\n80-mm aperture", xy=(25, minimum_width[0]),
+ax_f.plot(25, minimum_width[0], "o", color=ORANGE, ms=5, zorder=3)
+ax_f.annotate("current\n80-mm aperture", xy=(25, minimum_width[0]),
               xytext=(39, 780), color=ORANGE, fontsize=7,
               arrowprops=dict(arrowstyle="-", color=ORANGE, lw=0.7))
-ax_g.set(xlabel="Beam waist (mm)", ylabel="Minimum width (Hz)",
+ax_f.set(xlabel="Beam waist (mm)", ylabel="Minimum width (Hz)",
          xlim=(20, 360), ylim=(80, 2e3))
-ax_g.set_xticks([25, 50, 100, 200, 300])
-ax_g.get_xaxis().set_major_formatter(mpl.ticker.ScalarFormatter())
-ax_g.text(0.52, 0.12, r"matched aperture $\simeq3.2w$",
-          transform=ax_g.transAxes, ha="center", va="bottom",
+ax_f.set_xticks([25, 50, 100, 200, 300])
+ax_f.get_xaxis().set_major_formatter(mpl.ticker.ScalarFormatter())
+ax_f.text(0.52, 0.12, r"matched aperture $\simeq3.2w$",
+          transform=ax_f.transAxes, ha="center", va="bottom",
           color=GREY, fontsize=7)
 
 # Shared styling and panel labels.
-for label, ax in zip("abcdefg", [ax_a, ax_b, ax_c, ax_d, ax_e, ax_f, ax_g]):
-    x_panel = -0.23 if ax in [ax_e, ax_f, ax_g] else -0.13
-    y_panel = 1.15 if ax in [ax_e, ax_f, ax_g] else 1.08
+for label, ax in zip("abcdef", [ax_a, ax_b, ax_c, ax_d, ax_e, ax_f]):
+    x_panel = -0.13
+    y_panel = 1.08 if ax not in [ax_e, ax_f] else 1.12
     ax.text(x_panel, y_panel, label, transform=ax.transAxes, fontsize=9,
             fontweight="bold", va="top")
-for ax in [ax_b, ax_c, ax_d, ax_e, ax_f, ax_g]:
+for ax in [ax_b, ax_c, ax_d, ax_e, ax_f]:
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
 

@@ -55,6 +55,10 @@ def cmt_schematic(ax):
         ax.add_patch(Circle((x, .45), .095, fc=col, ec="white", lw=.8))
         ax.text(x, .45, txt, color="white", ha="center", va="center",
                 fontsize=10, fontweight="bold")
+    ax.text(.28, .31, "large-cavity mode", ha="center", va="top",
+            color=TEAL, fontsize=7.0)
+    ax.text(.72, .31, "small-cavity mode", ha="center", va="top",
+            color=GOLD, fontsize=7.0)
     ax.add_patch(FancyArrowPatch((.38,.45),(.62,.45),arrowstyle="<->",
                                  mutation_scale=9,lw=1.15,color=PURPLE))
     ax.text(.50,.52,r"$H(k_x)$",ha="center",color=PURPLE)
@@ -69,7 +73,7 @@ def cmt_schematic(ax):
                          connectionstyle="arc3,rad=0"))
     ax.text(.50,.91,r"$\mathbf{J}=D_s(k_x)\mathbf{u}$",ha="center",va="top",
             color=INK,fontsize=8.5)
-    ax.text(.50,-.01,"one eigenvector must darken both rows",ha="center",
+    ax.text(.50,-.01,"one Bloch eigenvector must darken both rows",ha="center",
             color=GREY,fontsize=7.2)
 
 
@@ -81,7 +85,7 @@ def kstyle(ax, kb):
 
 
 def hybrid(ax, d, kb, ib):
-    label(ax,"b"); ax.set_title("Bloch-hybridized eigenstate",pad=5)
+    label(ax,"b"); ax.set_title("Bloch phase tunes the hybrid coordinate",pad=5)
     al, ass = z(d,"a_large"), z(d,"a_small")
     norm = np.abs(al)**2 + np.abs(ass)**2
     wl, ws = np.abs(al)**2/norm, np.abs(ass)**2/norm

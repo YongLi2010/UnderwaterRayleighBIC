@@ -7,11 +7,11 @@ changes as the second Floquet channel opens.
 
 | Panel | Unique claim | Source | Visual audit |
 |---|---|---|---|
-| a | Finite sample, Gaussian aperture, and scan geometry | Model parameters | Pass; no collisions |
+| a | Ideal Bloch-wave drive and Fourier projection onto the reflected orders | periodic modal model | Pass; no finite-aperture assumptions |
 | b | The resonance linewidth visibly pinches off at the Rayleigh BIC | `wideangle_physical_pole.csv` | Pass; pole-derived Lorentzian spectral function is explicitly identified |
 | c | Quantitative linewidth evolution from 0 to 20 degrees | `wideangle_physical_pole.csv` | Pass; logarithmic axis and zero-value display floor documented in source |
-| d | Incident and reflected fields at normal incidence, the Rayleigh point, and above it | three finite-sample COMSOL solutions and matched no-sample references | Pass; common grid and one physical color scale |
-| e | Channel opening and scattering-derived linewidth | scan-line angular spectra and background-subtracted driven Floquet projections | Pass; propagating interval and independent eigenpole curve are shown |
+| d | Extracted pole linewidth and integrated weights of the two reflected orders | adaptive periodic scattering response | Pass; both channels are retained |
+| e | Near-field scan and Floquet reconstruction at a nearby driven state | periodic reference-subtracted field | Pass; common color scale and explicit channel markers |
 
 Exports: editable SVG, editable PDF, 600-dpi PNG preview, and 600-dpi TIFF.
 The PDF text audit passes with a minimum detected glyph size of `5.25 pt`.
@@ -24,10 +24,10 @@ The static validator's remaining warnings are reviewed false positives:
   verifies that all glyphs exceed 5 pt.
 
 No experimental data or stochastic uncertainty is presented. Panel b is a
-pole-derived normalized spectral function; panels a and d use deterministic
-COMSOL geometry and fields. Panel c uses the directly computed complex
-eigenfrequency linewidth. In panel e, the orange symbols are theory-derived
-FWHM values from complex driven-scattering amplitudes, not experimental data.
+pole-derived normalized spectral function; panel a is a schematic readout of
+the ideal periodic problem. Panels c and d use directly computed complex
+driven-scattering amplitudes, and panel e uses a deterministic reference-
+subtracted field. All are theory predictions, not experimental data.
 
 Image integrity: the field maps show the real pressure without local contrast
 adjustment, stitching, or selective masking. All six maps share one color
@@ -48,9 +48,8 @@ that limit.
 | b | The present `w=25 mm` source has a broad `7.2 deg` intensity FWHM | analytic Fourier transform of `exp[-(x/w)^2]` | Pass; all curves use the same normalization |
 | c | A single Bloch wave resolves the pole-linewidth pinch at the BIC | outgoing-eigenpole frequency and linewidth | Pass; guarded logarithm and exact BIC marker |
 | d | The current Gaussian beam averages the pinch over neighboring leaky states | angular convolution of the same pole spectral density | Pass; axes and color scale match panel c |
-| e | Both homogeneous radiation amplitudes close at the same BIC | directly computed `A0` and `A-1` eigenmode amplitudes | Pass; no scattering background is mixed into the amplitudes |
-| f | Angular averaging creates a finite spectral-resolution floor | pole linewidth and Gaussian-weighted frequency-distribution width | Pass; the floor is not labelled as an intrinsic linewidth |
-| g | Increasing waist systematically lowers that floor | the same forward model over `w=25--300 mm` | Pass; current aperture is explicitly identified |
+| e | Angular averaging creates a finite spectral-resolution floor | pole linewidth and Gaussian-weighted frequency-distribution width | Pass; the floor is not labelled as an intrinsic linewidth |
+| f | Increasing waist systematically lowers that floor | the same forward model over `w=25--300 mm` | Pass; current aperture is explicitly identified |
 
 The active source is `80 mm` wide, whereas the Gaussian waist is `25 mm`.
 For the pressure amplitude `exp[-(x/w)^2]`, the `1/e^2` intensity diameter is
@@ -58,7 +57,7 @@ For the pressure amplitude `exp[-(x/w)^2]`, the `1/e^2` intensity diameter is
 
 Panels c and d use a shared absolute spectral-density scale. Panel d is a
 forward prediction, not COMSOL data or experimental data. The finite-beam
-spectral width in panels f and g is the Gaussian-equivalent FWHM of the pole
+spectral width in panels e and f is the Gaussian-equivalent FWHM of the pole
 center-frequency distribution induced by the known angular spectrum. This
 moment-based quantity is used because the fully convolved response can become
 multipeaked, making an envelope FWHM discontinuous and estimator-dependent.

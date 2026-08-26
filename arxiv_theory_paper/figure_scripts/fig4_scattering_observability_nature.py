@@ -45,34 +45,50 @@ def bare(ax):
 
 
 def tank(ax):
+    """Ideal Bloch-wave readout; finite-beam details are reserved for Fig. 5."""
     bare(ax); label(ax,"a",x=-.04,y=1.01)
-    ax.set_title("Water-tank measurement",pad=4)
+    ax.set_title("Bloch-wave scattering",pad=4)
     ax.set_xlim(0,1); ax.set_ylim(0,1)
     ax.add_patch(Rectangle((.04,.08),.92,.79,fc=WATER,ec="#B8D4D7",lw=.75))
-    # phased source
-    for j in range(6):
-        x=.10+.045*j
-        ax.add_patch(Rectangle((x,.72),.032,.075,angle=-12,fc=BLUE,ec="white",lw=.35))
-    ax.text(.19,.83,"source array",ha="center",color=BLUE)
-    ax.add_patch(FancyArrowPatch((.23,.68),(.47,.27),arrowstyle="-|>",mutation_scale=8,lw=1.1,color=GOLD))
-    ax.add_patch(Arc((.47,.27),.17,.17,theta1=76,theta2=90,color=GOLD,lw=.75))
-    ax.text(.41,.39,r"$\theta$",color=GOLD)
-    # finite sample
-    y=.24; ax.plot([.22,.93],[y,y],color=INK,lw=1.0)
-    for m in range(8):
-        xl=.27+.079*m
-        ax.plot([xl,xl,xl+.030,xl+.030],[y,y-.10,y-.10,y],color=INK,lw=.6)
-        xs=xl+.046
-        ax.plot([xs,xs,xs+.014,xs+.014],[y,y-.045,y-.045,y],color=INK,lw=.6)
-    # scan aperture
-    ax.add_patch(Rectangle((.49,.36),.37,.25,fill=False,ec=TEAL,lw=.95,ls=(0,(3,2))))
-    for xx in np.linspace(.52,.83,7):
-        for yy in np.linspace(.39,.58,4):
-            ax.add_patch(Circle((xx,yy),.0048,fc=TEAL,ec="none",alpha=.55))
-    ax.add_patch(Circle((.74,.50),.016,fc="white",ec=TEAL,lw=1))
-    ax.plot([.74,.74],[.516,.64],color=TEAL,lw=.8)
-    ax.text(.68,.68,"complex pressure scan",ha="center",color=TEAL)
-    ax.text(.58,.045,"finite sample",ha="center",color=INK)
+
+    # Periodic rigid metagrating.  The repeated unit cell is deliberately
+    # schematic here; Fig. 2 carries the dimensional geometry.
+    y=.24; left=.16; right=.90
+    ax.plot([left,right],[y,y],color=INK,lw=1.0)
+    period=(right-left)/7
+    for m in range(7):
+        x=left+m*period
+        ax.plot([x+.18*period,x+.18*period,x+.50*period,x+.50*period],
+                [y,y-.105,y-.105,y],color=INK,lw=.65)
+        ax.plot([x+.64*period,x+.64*period,x+.76*period,x+.76*period],
+                [y,y-.050,y-.050,y],color=INK,lw=.65)
+    ax.annotate("",xy=(left+period,y-.14),xytext=(left,y-.14),
+                arrowprops=dict(arrowstyle="<->",color=GREY,lw=.65))
+    ax.text(left+.5*period,y-.19,r"$a$",ha="center",color=GREY)
+    ax.text(.08,.25,r"$\cdots$",ha="center",va="center",fontsize=10,color=GREY)
+    ax.text(.95,.25,r"$\cdots$",ha="center",va="center",fontsize=10,color=GREY)
+
+    # Incident Bloch wave and the two reflected orders used in the response
+    # maps.  The arrows terminate at the same aperture point to make the
+    # channel projection visually unambiguous.
+    hit=(.56,.34)
+    ax.add_patch(FancyArrowPatch((.28,.73),hit,arrowstyle="-|>",mutation_scale=8,
+                                 lw=1.05,color=GOLD))
+    ax.text(.24,.77,r"$p_{\mathrm{in}}$",color=GOLD,ha="center")
+    ax.add_patch(FancyArrowPatch(hit,(.72,.70),arrowstyle="-|>",mutation_scale=8,
+                                 lw=1.05,color=BLUE))
+    ax.add_patch(FancyArrowPatch(hit,(.82,.34),arrowstyle="-|>",mutation_scale=8,
+                                 lw=1.05,color=GOLD))
+    ax.text(.75,.74,r"$r_0$",color=BLUE,ha="center")
+    ax.text(.86,.30,r"$r_{-1}$",color=GOLD,ha="center")
+
+    # A phase-resolved line scan is the observable that produces the Fourier
+    # amplitudes; it is not an additional finite-sample schematic.
+    ax.plot([.21,.79],[.53,.53],color=TEAL,lw=.8,ls=(0,(3,2)))
+    for xx in np.linspace(.25,.75,6):
+        ax.add_patch(Circle((xx,.53),.007,fc="white",ec=TEAL,lw=.65))
+    ax.text(.50,.58,r"$p(x)\;\longrightarrow\;r_n(k_x,f)$",
+            ha="center",color=TEAL)
 
 
 def response_data():

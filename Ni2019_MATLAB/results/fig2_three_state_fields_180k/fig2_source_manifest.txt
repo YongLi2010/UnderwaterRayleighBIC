@@ -6,7 +6,7 @@ Fig. 2 source manifest
     eigenvalue branch from Gamma to the BZ edge, mirrored by reciprocity.
     Curve position is Re(Omega_p); colour is log10(Q), and therefore
     encodes the vanishing imaginary part. The same target branch contains
-    a symmetry-protected Gamma BIC and the off-Gamma Rayleigh BIC.
+    a Gamma dark mode and the off-Gamma Rayleigh BIC.
     Adjacent-sheet branches are
     excluded from the main panel.
 (c,d) kx_channel_evolution_physical_180k/physical_sheet_channel_evolution.csv
@@ -18,4 +18,5 @@ Fig. 2 source manifest
     height. Each nonzero component is normalized only by its magnitude at
     y=0, preserving its actual vertical decay or propagation law.
     Exact zeros remain exact and are shown by a red cross.
-    Gamma is the symmetry-protected BIC on the same physical target branch.
+    Gamma is shown only as the single-open-channel dark mode; no
+    mirror-symmetry protection is assumed for the asymmetric cell.

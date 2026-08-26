@@ -92,7 +92,9 @@ Gaussian-equivalent width of the pole center-frequency distribution sampled by
 the beam. This is an angular-dispersion resolution floor, distinct from the
 intrinsic outgoing-eigenpole linewidth. Predictions for larger waists assume a
 matched active width of about `3.2w` and a correspondingly longer sample; only
-the `w=25 mm`, `80 mm` aperture is the current model geometry.
+the `w=25 mm`, `80 mm` aperture is the current model geometry. The six-panel
+figure intentionally omits the homogeneous `A_0,A_{-1}` curves, which are
+already shown in the eigenproblem and CMT figures.
 
 The large `.mph` files are published as release assets at:
 

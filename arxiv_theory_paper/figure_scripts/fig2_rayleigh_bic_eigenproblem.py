@@ -664,10 +664,13 @@ def draw_full_band(ax: plt.Axes, cax: plt.Axes, values: np.ndarray) -> None:
         linewidth=0.6,
         zorder=10,
     )
+    # The asymmetric two-groove cell does not establish a mirror-symmetry
+    # protection rule at Gamma.  Use the neutral label "dark mode" here;
+    # the strict Rayleigh-BIC claim is reserved for the red threshold point.
     ax.text(
         0.018,
         gamma["Omega_real"] - 0.035,
-        r"$\Gamma$ BIC",
+        r"$\Gamma$ dark mode",
         color="#6D4C8D",
         fontsize=6.5,
         ha="left",
@@ -715,7 +718,7 @@ def draw_full_band(ax: plt.Axes, cax: plt.Axes, values: np.ndarray) -> None:
     ax.set_xticks([-0.5, -0.25, 0.0, 0.25, 0.5])
     ax.set_yticks([0.0, 0.25, 0.5, 0.75, 1.0])
     ax.set_xlabel(r"Bloch wave number, $\kappa=k_xa/(2\pi)$")
-    ax.set_ylabel(r"$\mathrm{Re}\,\Omega$")
+    ax.set_ylabel(r"$\mathrm{Re}\,\Omega_p$")
     style_axis(ax)
 
     scalar = mpl.cm.ScalarMappable(norm=Q_NORM, cmap=Q_CMAP)
@@ -774,7 +777,7 @@ def draw_zoomed_pole(ax: plt.Axes, values: np.ndarray, g: dict[str, float]) -> N
     ax.set_xticks([0.104, 0.108, 0.112, 0.116])
     ax.set_yticks([0.885, 0.890, 0.895])
     ax.set_xlabel(r"$\kappa$")
-    ax.set_ylabel(r"$\mathrm{Re}\,\Omega$")
+    ax.set_ylabel(r"$\mathrm{Re}\,\Omega_p$")
     style_axis(ax, grid=True)
 
     axq = ax.twinx()
@@ -953,7 +956,7 @@ def draw_channel_decomposition(
     del g  # The decomposition is evaluated only in the homogeneous exterior.
     _, _, states = load_fields()
     orders = [1, 0, -1]
-    headers = [r"$\Gamma$ BIC", "Rayleigh BIC", r"$\kappa>\kappa_{\mathrm{BIC}}$"]
+    headers = [r"$\Gamma$ dark mode", "Rayleigh BIC", r"$\kappa>\kappa_{\mathrm{BIC}}$"]
     # A tall exterior window makes the channel topology visible without any
     # a-priori open/closed filtering: closed orders decay naturally, whereas
     # propagating orders survive into the far field.
@@ -1055,7 +1058,7 @@ def write_manifest(g: dict[str, float]) -> None:
         "    eigenvalue branch from Gamma to the BZ edge, mirrored by reciprocity.",
         "    Curve position is Re(Omega_p); colour is log10(Q), and therefore",
         "    encodes the vanishing imaginary part. The same target branch contains",
-        "    a symmetry-protected Gamma BIC and the off-Gamma Rayleigh BIC.",
+        "    a Gamma dark mode and the off-Gamma Rayleigh BIC.",
         "    Adjacent-sheet branches are",
         "    excluded from the main panel.",
         "(c,d) kx_channel_evolution_physical_180k/physical_sheet_channel_evolution.csv",
@@ -1067,7 +1070,8 @@ def write_manifest(g: dict[str, float]) -> None:
         "    height. Each nonzero component is normalized only by its magnitude at",
         "    y=0, preserving its actual vertical decay or propagation law.",
         "    Exact zeros remain exact and are shown by a red cross.",
-        "    Gamma is the symmetry-protected BIC on the same physical target branch.",
+        "    Gamma is shown only as the single-open-channel dark mode; no",
+        "    mirror-symmetry protection is assumed for the asymmetric cell.",
     ]
     out.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
