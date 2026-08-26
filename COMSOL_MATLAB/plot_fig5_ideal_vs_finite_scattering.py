@@ -1,16 +1,15 @@
-"""Figure 5: ideal Bloch scattering versus a finite Gaussian-beam sample."""
+"""Figure 5: finite Gaussian beams regularize an ideal Rayleigh BIC."""
 from pathlib import Path
 import csv
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+from matplotlib.patches import Rectangle, Polygon, Circle
 
 ROOT = Path(__file__).resolve().parents[1]
-FIN = ROOT / "COMSOL_MATLAB" / "rounded_180k_results" / "finite_20period_experiment"
-INF = ROOT / "Ni2019_MATLAB" / "results" / "fig5_infinite_period_fields_180k"
 POLE = ROOT / "Ni2019_MATLAB" / "results" / "fig4_wideangle_180k"
-DRIVEN = ROOT / "Ni2019_MATLAB" / "results" / "fig4_experimental_observables_180k"
+SCAT = (ROOT / "Ni2019_MATLAB" / "results"
+        / "fig4_experimental_observables_180k")
 OUT = ROOT / "figures" / "comsol_numerical_experiment"
 OUT.mkdir(parents=True, exist_ok=True)
 
@@ -23,15 +22,20 @@ mpl.rcParams.update({
     "lines.linewidth": 1.15, "svg.fonttype": "none", "pdf.fonttype": 42,
 })
 
-BLUE = "#1764A2"
-ORANGE = "#E67E22"
 DARK = "#20262E"
-GREY = "#77818C"
-LIGHT = "#DCE2E7"
-SOUND_SPEED = 1500.0
-PERIOD_M = 7.42e-3
-SCAN_HEIGHT_M = 20e-3
-SAMPLE_PERIODS = 20
+GREY = "#7A848E"
+LIGHT = "#DCE3E8"
+BLUE = "#1764A2"
+CYAN = "#62AFC5"
+ORANGE = "#E67E22"
+PURPLE = "#7356A5"
+THETA_BIC = 7.09966291282572
+F_BIC = 180000.0
+C0 = 1500.0
+F0 = 180e3
+PERIOD_MM = 7.42
+CURRENT_APERTURE_MM = 80.0
+GAUSSIAN_FWHM_FACTOR = 2.3548200450309493
 
 
 def read_csv(path):
@@ -40,319 +44,250 @@ def read_csv(path):
     return {key: np.array([float(row[key]) for row in rows]) for key in rows[0]}
 
 
-def continuous_spectrum(path, frequency_hz):
-    """Dense finite-window Fourier integral; resolution remains ~2*pi/L."""
-    data = read_csv(path)
-    x = data["x_m"]
-    field = data["reflected_real_pa"] + 1j * data["reflected_imag_pa"]
-    k0 = 2 * np.pi * frequency_hz / SOUND_SPEED
-    q = np.linspace(-1.25, 1.25, 1201)
-    spectrum = np.exp(-1j * np.outer(q * k0, x)) @ (
-        field * np.hanning(field.size))
-    power = np.abs(spectrum) ** 2
-    return q, 10 * np.log10(np.maximum(power / np.max(power), 1e-6))
+def gaussian_weight(theta_internal, theta_center, waist_mm):
+    """Normalized angular intensity for exp[-(x/w)^2] pressure amplitude."""
+    k0 = 2 * np.pi * F0 / C0
+    delta_kx = k0 * (np.sin(np.deg2rad(theta_internal))
+                     - np.sin(np.deg2rad(theta_center)))
+    weight = np.exp(-0.5 * (waist_mm * 1e-3 * delta_kx) ** 2)
+    return weight / np.trapezoid(weight, theta_internal)
 
 
-def ideal_windowed_spectrum(orders, state, frequency_hz):
-    """Apply the finite-sample measurement operator to an ideal Floquet field.
-
-    The infinite-periodic reflected field is reconstructed from its complex
-    Floquet coefficients at the same 20-mm observation height used by COMSOL.
-    A 20-period Hann window and the same dense Fourier projection as in panel d
-    turn the ideal delta-like Floquet lines into directly comparable curves.
-    """
-    select = orders["state"] == state
-    k0 = 2 * np.pi * frequency_hz / SOUND_SPEED
-    x = np.linspace(0, SAMPLE_PERIODS * PERIOD_M, 4001)
-    amplitude = (orders["amplitude_abs"][select]
-                 * np.exp(1j * orders["amplitude_phase_rad"][select]))
-    kx = orders["kx_over_k0"][select] * k0
-    ky = (orders["ky_real_over_k0"][select]
-          + 1j * orders["ky_imag_over_k0"][select]) * k0
-    field = np.sum(
-        amplitude[:, None]
-        * np.exp(-1j * (kx[:, None] * x[None, :]
-                        + ky[:, None] * SCAN_HEIGHT_M)), axis=0)
-    q = np.linspace(-1.25, 1.25, 1201)
-    spectrum = np.exp(-1j * np.outer(q * k0, x)) @ (
-        field * np.hanning(field.size))
-    power = np.abs(spectrum) ** 2
-    return q, 10 * np.log10(np.maximum(power / np.max(power), 1e-6))
-
-
-def measured_fwhm(path):
-    """FWHM of the background-subtracted ideal plane-wave Am1 response."""
-    data = read_csv(path)
-    angle_out, width_out = [], []
-    for angle in np.unique(data["theta_deg"]):
-        select = np.isclose(data["theta_deg"], angle, rtol=0, atol=2e-10)
-        frequency = data["frequency_hz"][select]
-        amplitude = (data["Am1_real"][select]
-                     + 1j * data["Am1_imag"][select])
-        valid = (np.isfinite(frequency) & np.isfinite(amplitude.real)
-                 & np.isfinite(amplitude.imag))
-        if np.count_nonzero(valid) < 15:
-            continue
-        frequency, amplitude = frequency[valid], amplitude[valid]
-        order = np.argsort(frequency)
-        frequency, amplitude = frequency[order], amplitude[order]
-        intensity = np.abs(amplitude - 0.5 * (amplitude[0] + amplitude[-1])) ** 2
-        peak = int(np.argmax(intensity))
-        half = intensity[peak] / 2
-        left = np.flatnonzero(intensity[:peak] <= half)
-        right = np.flatnonzero(intensity[peak + 1:] <= half)
-        if left.size == 0 or right.size == 0:
-            continue
-        il = left[-1]
-        ir = peak + 1 + right[0]
-        fl = np.interp(half, intensity[il:il + 2], frequency[il:il + 2])
-        fr = np.interp(half, intensity[ir - 1:ir + 1][::-1],
-                       frequency[ir - 1:ir + 1][::-1])
-        if fr > fl:
-            angle_out.append(angle)
-            width_out.append(fr - fl)
-    return np.array(angle_out), np.array(width_out)
-
-
-def ideal_and_gaussian_maps(pole):
-    """Ideal Lorentzian spectral density and its Gaussian angular average."""
-    theta_positive = pole["theta_deg"]
-    frequency_positive = pole["frequency_hz"]
-    linewidth_positive = pole["linewidth_hz"]
+def spectral_model(pole):
+    """Pole spectral density and its finite-beam angular convolutions."""
+    assert np.all(np.diff(pole["theta_deg"]) > 0)
     theta_internal = np.linspace(-20, 20, 2001)
-    frequency_internal = np.interp(
-        np.abs(theta_internal), theta_positive, frequency_positive)
-    linewidth_internal = np.interp(
-        np.abs(theta_internal), theta_positive, linewidth_positive)
-    frequency_grid = np.linspace(179600, 180900, 1301)
-    half = 0.5 * linewidth_internal
+    pole_frequency = np.interp(
+        np.abs(theta_internal), pole["theta_deg"], pole["frequency_hz"])
+    linewidth = np.interp(
+        np.abs(theta_internal), pole["theta_deg"], pole["linewidth_hz"])
+    frequency = np.arange(178600.0, 181402.0, 2.0)
+    half = 0.5 * linewidth
     ideal_internal = half[None, :] ** 2 / (
-        (frequency_grid[:, None] - frequency_internal[None, :]) ** 2
+        (frequency[:, None] - pole_frequency[None, :]) ** 2
         + half[None, :] ** 2 + 1e-300)
 
     theta_command = np.linspace(5.8, 8.5, 136)
-    ideal_map = np.empty((frequency_grid.size, theta_command.size))
-    for row in range(frequency_grid.size):
-        ideal_map[row] = np.interp(
-            theta_command, theta_internal, ideal_internal[row])
+    pole_command = np.interp(
+        theta_command, pole["theta_deg"], pole["frequency_hz"])
+    linewidth_command = np.interp(
+        theta_command, pole["theta_deg"], pole["linewidth_hz"])
+    half_command = 0.5 * linewidth_command
+    ideal_command = half_command[None, :] ** 2 / (
+        (frequency[:, None] - pole_command[None, :]) ** 2
+        + half_command[None, :] ** 2 + 1e-300)
 
-    # Source amplitude exp[-(x/w)^2] has angular intensity
-    # exp[-(w*Delta kx)^2/2]. The 80-mm truncation is negligible at w=25 mm.
-    waist = 25e-3
-    k_reference = 2 * np.pi * 180e3 / 1500
-    finite_map = np.empty_like(ideal_map)
-    for column, theta_center in enumerate(theta_command):
-        delta_kx = k_reference * (
-            np.sin(np.deg2rad(theta_internal))
-            - np.sin(np.deg2rad(theta_center)))
-        weight = np.exp(-0.5 * (waist * delta_kx) ** 2)
-        weight /= np.trapezoid(weight, theta_internal)
-        finite_map[:, column] = np.trapezoid(
-            ideal_internal * weight[None, :], theta_internal, axis=1)
-
-    apparent_width = np.full(theta_command.size, np.nan)
-    for column in range(theta_command.size):
-        response = finite_map[:, column]
-        above = np.flatnonzero(response >= 0.5 * np.max(response))
-        if above.size > 1:
-            apparent_width[column] = (
-                frequency_grid[above[-1]] - frequency_grid[above[0]])
-    return theta_command, frequency_grid, ideal_map, finite_map, apparent_width
+    waist_grid = np.array([25., 35., 50., 75., 100., 150., 200., 250., 300.])
+    maps, angular_bandwidths = {}, {}
+    dtheta = theta_internal[1] - theta_internal[0]
+    trap = np.ones(theta_internal.size)
+    trap[[0, -1]] = 0.5
+    for waist in waist_grid:
+        weights = np.column_stack([
+            gaussian_weight(theta_internal, theta, waist)
+            for theta in theta_command])
+        response = ideal_internal @ (weights * trap[:, None] * dtheta)
+        maps[waist] = response
+        integration = weights * trap[:, None] * dtheta
+        mean_frequency = np.sum(pole_frequency[:, None] * integration, axis=0)
+        variance = np.sum(
+            (pole_frequency[:, None] - mean_frequency[None, :]) ** 2
+            * integration, axis=0)
+        angular_bandwidths[waist] = GAUSSIAN_FWHM_FACTOR * np.sqrt(variance)
+    return (theta_command, frequency, ideal_command, maps, angular_bandwidths,
+            waist_grid, linewidth_command, pole_command)
 
 
-finite_stems = ["gaussian_state_1_gamma", "gaussian_state_2_rayleigh_bic",
-                "gaussian_state_3_above_bic"]
-infinite_stems = ["gamma_limit", "rayleigh_bic_limit", "above_bic"]
-frequencies = np.array([178780.2005, 180046.681327, 180498.322])
-titles = [r"$0^\circ$", "Rayleigh BIC", r"$10.05^\circ$"]
-colors = [GREY, BLUE, ORANGE]
-
-xf = np.loadtxt(FIN / "finite_bic_field_x_m.csv", delimiter=",") * 1e3
-yf = np.loadtxt(FIN / "finite_bic_field_y_m.csv", delimiter=",") * 1e3
-xi = np.loadtxt(INF / "x_over_a.csv", delimiter=",")
-yi = np.loadtxt(INF / "y_over_a.csv", delimiter=",")
-
-finite_incident, finite_reflected, infinite_reflected = [], [], []
-for finite_stem, infinite_stem in zip(finite_stems, infinite_stems):
-    finite_incident.append(
-        np.loadtxt(FIN / f"{finite_stem}_incident_real_pa.csv", delimiter=",")
-        + 1j * np.loadtxt(FIN / f"{finite_stem}_incident_imag_pa.csv", delimiter=","))
-    finite_reflected.append(
-        np.loadtxt(FIN / f"{finite_stem}_reflected_real_pa.csv", delimiter=",")
-        + 1j * np.loadtxt(FIN / f"{finite_stem}_reflected_imag_pa.csv", delimiter=","))
-    infinite_reflected.append(
-        np.loadtxt(INF / f"{infinite_stem}_reflected_real.csv", delimiter=",")
-        + 1j * np.loadtxt(INF / f"{infinite_stem}_reflected_imag.csv", delimiter=","))
-
-incident_scale = np.percentile(np.concatenate([
-    np.abs(field[np.isfinite(field)]) for field in finite_incident]), 99.5)
-finite_reflected = [field / incident_scale for field in finite_reflected]
-
-orders = read_csv(INF / "floquet_orders.csv")
-ideal_summary = read_csv(INF / "state_summary.csv")
-ideal_frequencies = ideal_summary["frequency_hz"]
 pole = read_csv(POLE / "wideangle_physical_pole.csv")
-theta_scattering, width_scattering = measured_fwhm(
-    DRIVEN / "adaptive_scattering_response.csv")
-(theta_map, frequency_map, ideal_map, finite_map,
- finite_width) = ideal_and_gaussian_maps(pole)
+radiation = read_csv(SCAT / "pole_and_radiation_summary.csv")
+(theta, frequency, ideal_map, gaussian_maps, angular_bandwidths,
+ waist_grid, eigen_width, pole_frequency) = spectral_model(pole)
 
-# Figure contract: the ideal BIC is resolved by a Bloch plane wave and discrete
-# Floquet projection, whereas a finite Gaussian beam angularly averages nearby
-# leaky states and replaces the linewidth collapse by an aperture-limited floor.
-fig = plt.figure(figsize=(7.2047244, 8.05))
-outer = fig.add_gridspec(4, 1, height_ratios=[0.72, 0.72, 0.90, 0.92], hspace=0.52)
-ideal_grid = outer[0].subgridspec(1, 3, wspace=0.08)
-finite_grid = outer[1].subgridspec(1, 3, wspace=0.08)
-ideal_axes = np.array([fig.add_subplot(ideal_grid[0, col]) for col in range(3)])
-finite_axes = np.array([fig.add_subplot(finite_grid[0, col]) for col in range(3)])
-middle = outer[2].subgridspec(1, 2, wspace=0.34)
+# Source data exported from the exact curves drawn in quantitative panels.
+with open(OUT / "Fig5_gaussian_beam_scaling.csv", "w", newline="") as handle:
+    writer = csv.writer(handle)
+    writer.writerow(["theta_deg", "intrinsic_linewidth_hz",
+                     "angular_bandwidth_w25_hz", "angular_bandwidth_w100_hz",
+                     "angular_bandwidth_w200_hz"])
+    writer.writerows(zip(theta, eigen_width, angular_bandwidths[25.],
+                         angular_bandwidths[100.], angular_bandwidths[200.]))
+with open(OUT / "Fig5_minimum_width_vs_waist.csv", "w", newline="") as handle:
+    writer = csv.writer(handle)
+    writer.writerow(["waist_mm", "angular_fwhm_deg",
+                     "minimum_angular_bandwidth_hz", "matched_aperture_mm",
+                     "minimum_period_count"])
+    k0 = 2 * np.pi * F0 / C0
+    for waist in waist_grid:
+        angular_fwhm = np.rad2deg(
+            GAUSSIAN_FWHM_FACTOR / (k0 * waist * 1e-3
+                                    * np.cos(np.deg2rad(THETA_BIC))))
+        aperture = 3.2 * waist
+        writer.writerow([waist, angular_fwhm,
+                         np.nanmin(angular_bandwidths[waist]), aperture,
+                         np.ceil(aperture / PERIOD_MM)])
+
+# Figure contract: a finite beam cannot itself realize the single-k BIC limit;
+# its known angular spectrum permits a controlled extrapolation to that limit.
+fig = plt.figure(figsize=(7.2047244, 7.15))
+outer = fig.add_gridspec(3, 1, height_ratios=[0.78, 1.06, 0.88], hspace=0.47)
+top = outer[0].subgridspec(1, 2, width_ratios=[1.18, 0.82], wspace=0.28)
+middle = outer[1].subgridspec(1, 2, wspace=0.16)
+bottom = outer[2].subgridspec(1, 3, wspace=0.40)
+ax_a = fig.add_subplot(top[0, 0])
+ax_b = fig.add_subplot(top[0, 1])
 ax_c = fig.add_subplot(middle[0, 0])
 ax_d = fig.add_subplot(middle[0, 1])
-bottom = outer[3].subgridspec(1, 3, wspace=0.40)
 ax_e = fig.add_subplot(bottom[0, 0])
 ax_f = fig.add_subplot(bottom[0, 1])
 ax_g = fig.add_subplot(bottom[0, 2])
 
-field_limit = 2.0
-field_image = None
-use_yi = (yi >= 0.12) & (yi <= 5.0)
-extent_i = [xi.min(), xi.max(), yi[use_yi].min(), yi[use_yi].max()]
-for column, ax in enumerate(ideal_axes):
-    field_image = ax.imshow(np.real(infinite_reflected[column][use_yi]),
-                            origin="lower", extent=extent_i, aspect="auto",
-                            cmap="RdBu_r", vmin=-field_limit, vmax=field_limit,
-                            interpolation="bilinear", rasterized=True)
-    ax.axhline(0.12, color=DARK, lw=0.6)
-    ax.set(xlim=(-2.5, 2.5), ylim=(0.12, 5), xticks=[-2, 0, 2], yticks=[1, 3, 5],
-           xlabel="x/a")
-    ax.set_title(titles[column], pad=3)
-    if column:
-        ax.tick_params(labelleft=False)
-    else:
-        ax.set_ylabel("y/a")
+# a, measurement and k-space recovery principle.
+ax_a.set(xlim=(0, 1), ylim=(0, 1))
+ax_a.axis("off")
+sample_left, sample_right, sample_y = 0.04, 0.70, 0.19
+ax_a.add_patch(Rectangle((sample_left, sample_y - 0.055),
+                         sample_right - sample_left, 0.055,
+                         facecolor="#59636D", edgecolor="none"))
+cell_width = (sample_right - sample_left) / 20
+for xg in np.linspace(sample_left, sample_right - cell_width, 20):
+    ax_a.add_patch(Rectangle((xg + 0.18 * cell_width, sample_y - 0.035),
+                             0.28 * cell_width, 0.035,
+                             facecolor="white", edgecolor="none"))
+    ax_a.add_patch(Rectangle((xg + 0.68 * cell_width, sample_y - 0.025),
+                             0.13 * cell_width, 0.025,
+                             facecolor="white", edgecolor="none"))
+ax_a.text(0.37, 0.085, r"20 periods ($20a=148.4$ mm)", ha="center")
+source_l, source_r, source_y = 0.20, 0.56, 0.87
+ax_a.plot([source_l, source_r], [source_y, source_y], color=ORANGE,
+          lw=4.0, solid_capstyle="butt")
+ax_a.annotate("", xy=(source_l, 0.94), xytext=(source_r, 0.94),
+              arrowprops=dict(arrowstyle="<->", color=DARK, lw=0.75))
+ax_a.text(0.38, 0.965, "80-mm active aperture", ha="center", va="bottom")
+beam = Polygon([[source_l, source_y - 0.015], [source_r, source_y - 0.015],
+                [0.54, sample_y], [0.21, sample_y]], closed=True,
+               facecolor="#E7F2F5", edgecolor="none", alpha=0.95)
+ax_a.add_patch(beam)
+for offset, alpha in [(-0.10, 0.25), (-0.05, 0.48), (0, 0.85),
+                      (0.05, 0.48), (0.10, 0.25)]:
+    ax_a.plot([0.38 + offset, 0.38 + offset - 0.04],
+              [source_y - 0.02, sample_y + 0.02], color=CYAN,
+              lw=0.9, alpha=alpha)
+ax_a.text(0.39, 0.67, r"$w=25$ mm", ha="center", color=ORANGE)
+scan_y = 0.43
+ax_a.plot([sample_left, sample_right], [scan_y, scan_y], color=BLUE,
+          lw=0.8, ls=(0, (3, 2)))
+for xp in np.linspace(0.10, 0.64, 6):
+    ax_a.add_patch(Circle((xp, scan_y), 0.010, facecolor="white",
+                          edgecolor=BLUE, lw=0.7))
+ax_a.text(0.37, scan_y + 0.035, r"complex scan $p_{\rm refl}(x,f)$",
+          ha="center", color=BLUE)
+ax_a.annotate("", xy=(0.82, 0.51), xytext=(0.70, 0.51),
+              arrowprops=dict(arrowstyle="->", color=DARK, lw=0.8))
+ax_a.text(0.76, 0.55, r"$\mathcal{F}_x$", ha="center")
+ax_a.plot([0.84, 0.96], [0.51, 0.51], color=DARK, lw=0.65)
+ax_a.annotate("", xy=(0.89, 0.69), xytext=(0.89, 0.51),
+              arrowprops=dict(arrowstyle="->", color=BLUE, lw=1.1))
+ax_a.annotate("", xy=(0.96, 0.51), xytext=(0.89, 0.51),
+              arrowprops=dict(arrowstyle="->", color=ORANGE, lw=1.1))
+ax_a.text(0.875, 0.72, r"$n=0$", color=BLUE, ha="center")
+ax_a.text(0.95, 0.44, r"$n=-1$", color=ORANGE, ha="center")
+ax_a.text(0.90, 0.25, r"$r_n(k_x,f)$", ha="center", fontweight="bold")
 
-use_yf = (yf >= 0) & (yf <= 50)
-extent_f = [xf.min(), xf.max(), 0, 50]
-for column, ax in enumerate(finite_axes):
-    ax.imshow(np.real(finite_reflected[column][use_yf]), origin="lower",
-              extent=extent_f, aspect="auto", cmap="RdBu_r",
-              vmin=-field_limit, vmax=field_limit,
-              interpolation="bilinear", rasterized=True)
-    ax.axhline(20, color=ORANGE, lw=0.6, ls=(0, (3, 2)))
-    ax.set(xlim=(0, 148.4), ylim=(0, 50), xticks=[0, 50, 100, 150],
-           yticks=[0, 20, 40], xlabel="x (mm)")
-    if column:
-        ax.tick_params(labelleft=False)
-    else:
-        ax.set_ylabel("y (mm)")
-fig.colorbar(field_image, ax=[*ideal_axes, *finite_axes], fraction=0.010,
-             pad=0.010, label=r"Re$(p_{\rm refl})/p_{\rm inc}$")
+# b, angular resolution imposed by the beam waist.
+delta_theta = np.linspace(-10, 10, 1001)
+k0 = 2 * np.pi * F0 / C0
+beam_colors = {25.: ORANGE, 100.: BLUE, 200.: PURPLE}
+for waist in [25., 100., 200.]:
+    delta_kx = k0 * (np.sin(np.deg2rad(THETA_BIC + delta_theta))
+                     - np.sin(np.deg2rad(THETA_BIC)))
+    intensity = np.exp(-0.5 * (waist * 1e-3 * delta_kx) ** 2)
+    fwhm = np.rad2deg(GAUSSIAN_FWHM_FACTOR /
+                     (k0 * waist * 1e-3 * np.cos(np.deg2rad(THETA_BIC))))
+    label = rf"{int(waist)} mm  ({fwhm:.1f}$^\circ$)"
+    ax_b.plot(delta_theta, intensity, color=beam_colors[waist], label=label)
+ax_b.axvline(0, color=LIGHT, lw=0.7)
+ax_b.set(xlabel=r"Angular offset, $\Delta\theta$ (deg)",
+         ylabel="Incident intensity", xlim=(-10, 10), ylim=(0, 1.04),
+         yticks=[0, 0.5, 1])
+ax_b.legend(title="Waist (angular FWHM)", loc="upper right",
+            handlelength=1.3, title_fontsize=7.2)
+ax_b.text(-9.6, 0.87, "current", color=ORANGE, fontsize=7,
+          fontweight="bold")
 
-# c-d, identical field-to-spectrum extraction for ideal and finite systems.
-spectrum_rows = []
-for state, frequency, color, label in zip(
-        [1, 2, 3], ideal_frequencies, colors, titles):
-    q, spectrum = ideal_windowed_spectrum(orders, state, frequency)
-    ax_c.plot(q, spectrum, color=color, label=label)
-    spectrum_rows.extend(zip(np.full(q.size, "ideal_infinite"),
-                             np.full(q.size, state),
-                             np.full(q.size, frequency), q, spectrum))
-ax_c.axvline(-1, color=LIGHT, lw=0.65)
-ax_c.axvline(1, color=LIGHT, lw=0.65)
-ax_c.set(xlabel=r"Angular spectrum, $k_x/k_0$",
-         ylabel="Normalized power (dB)",
-         xlim=(-1.25, 1.25), ylim=(-60, 2), xticks=[-1, 0, 1])
-ax_c.set_title("Infinite periodic field", pad=3)
-ax_c.legend(loc="upper right", handlelength=1.4)
-
-# d, continuous finite-aperture spectra extracted from the COMSOL scan line.
-for stem, frequency, color, label in zip(
-        finite_stems, frequencies, colors, titles):
-    q, spectrum = continuous_spectrum(FIN / f"{stem}_scanline.csv", frequency)
-    ax_d.plot(q, spectrum, color=color, label=label)
-    state = finite_stems.index(stem) + 1
-    spectrum_rows.extend(zip(np.full(q.size, "finite_gaussian"),
-                             np.full(q.size, state),
-                             np.full(q.size, frequency), q, spectrum))
-ax_d.axvspan(-1, 1, color="#F2F4F6", zorder=-3)
-ax_d.axvline(-1, color=LIGHT, lw=0.65)
-ax_d.axvline(1, color=LIGHT, lw=0.65)
-ax_d.set(xlabel=r"Angular spectrum, $k_x/k_0$",
-         ylabel="Normalized power (dB)",
-         xlim=(-1.25, 1.25), ylim=(-60, 2))
-ax_d.set_title("Finite Gaussian field", pad=3)
-ax_d.legend(loc="upper right", handlelength=1.4)
-
-# e-f, ideal spectral pinch versus the finite-beam angular average.
+# c-d, ideal pole spectrum and the current finite-beam convolution.
+extent = [theta.min(), theta.max(), frequency.min() / 1e3,
+          frequency.max() / 1e3]
 ideal_log = np.log10(np.maximum(ideal_map, 1e-6))
-finite_log = np.log10(np.maximum(finite_map, 1e-6))
-extent_map = [theta_map.min(), theta_map.max(),
-              frequency_map.min() / 1e3, frequency_map.max() / 1e3]
-map_image = ax_e.imshow(ideal_log, origin="lower", extent=extent_map,
-                        aspect="auto", cmap="magma", vmin=-6, vmax=0,
-                        interpolation="bilinear", rasterized=True)
-ax_f.imshow(finite_log, origin="lower", extent=extent_map, aspect="auto",
-            cmap="magma", vmin=-6, vmax=0, interpolation="bilinear",
-            rasterized=True)
-for ax, title in [(ax_e, "Bloch plane wave"), (ax_f, "Gaussian beam")]:
-    ax.axvline(7.0996629, color="white", lw=0.7, ls=(0, (3, 2)))
-    ax.set(xlabel=r"$\theta$ (deg)", xlim=(5.8, 8.5), ylim=(179.6, 180.9))
+gaussian_log = np.log10(np.maximum(gaussian_maps[25.], 1e-6))
+image = ax_c.imshow(ideal_log, origin="lower", extent=extent, aspect="auto",
+                    cmap="magma", vmin=-6, vmax=0,
+                    interpolation="bilinear", rasterized=True)
+ax_d.imshow(gaussian_log, origin="lower", extent=extent, aspect="auto",
+            cmap="magma", vmin=-6, vmax=0,
+            interpolation="bilinear", rasterized=True)
+for ax, title in [(ax_c, "Bloch plane wave"),
+                  (ax_d, r"Gaussian beam, $w=25$ mm")]:
+    ax.axvline(THETA_BIC, color="white", lw=0.75, ls=(0, (3, 2)))
+    ax.set(xlabel=r"Central angle, $\theta$ (deg)", xlim=(5.8, 8.5),
+           ylim=(179.55, 181.10))
     ax.set_title(title, pad=3)
-ax_e.set_ylabel("f (kHz)")
-ax_f.tick_params(labelleft=False)
-cax = inset_axes(ax_f, width="38%", height="4%", loc="upper right", borderpad=0.8)
-cbar = fig.colorbar(map_image, cax=cax, orientation="horizontal", ticks=[-6, 0])
-cbar.ax.tick_params(labelsize=7.2, length=1.8, pad=1)
-cbar.ax.set_title(r"$\log_{10}\mathcal{L}$", fontsize=7.2, pad=2, loc="left")
+ax_c.set_ylabel("Frequency (kHz)")
+ax_d.tick_params(labelleft=False)
+cbar = fig.colorbar(image, ax=[ax_c, ax_d], fraction=0.022, pad=0.012,
+                    ticks=[-6, -3, 0])
+cbar.set_label(r"Pole spectral density, $\log_{10}\mathcal{L}$")
 
-# g, field-extracted ideal linewidth and finite-beam apparent linewidth floor.
-theta_bic = 7.0996629
-theta_pole = pole["theta_deg"]
-linewidth_pole = pole["linewidth_hz"]
-show_pole = (theta_pole >= 5.8) & (theta_pole <= 8.5)
-ax_g.semilogy(theta_pole[show_pole],
-              np.maximum(linewidth_pole[show_pole], 1e-8),
-              color=DARK, label="Eigenpole")
-show_scattering = ((theta_scattering >= theta_bic + 0.015)
-                   & (theta_scattering <= 8.5))
-indices = np.flatnonzero(show_scattering)[::9]
-ax_g.semilogy(theta_scattering[indices], width_scattering[indices], "o",
-              ms=3.5, mfc="white", mec=ORANGE, mew=0.9,
-              label="Plane wave")
-ax_g.semilogy(theta_map, finite_width, color=BLUE, ls=(0, (3, 2)),
-              label="Gaussian beam")
-ax_g.axvline(theta_bic, color=LIGHT, lw=0.7, zorder=-1)
-ax_g.set(xlabel=r"$\theta$ (deg)", ylabel="Extracted FWHM (Hz)",
-         xlim=(5.8, 8.5), ylim=(1e-8, 2e3))
-ax_g.legend(loc="lower left", handlelength=1.4)
+# e, the intrinsic simultaneous closure of both homogeneous channels.
+ax_e.semilogy(radiation["theta_deg"],
+              np.maximum(radiation["radiation_A0"], 1e-17),
+              color=BLUE, label=r"$|A_0|$")
+ax_e.semilogy(radiation["theta_deg"],
+              np.maximum(radiation["radiation_Am1"], 1e-17),
+              color=ORANGE, label=r"$|A_{-1}|$")
+ax_e.axvline(THETA_BIC, color=LIGHT, lw=0.7)
+ax_e.set(xlabel=r"$\theta$ (deg)", ylabel="Eigenmode radiation",
+         xlim=(7.099, 8.52), ylim=(1e-17, 1e-2),
+         xticks=[7.1, 7.5, 8.0, 8.5])
+ax_e.legend(loc="lower right", handlelength=1.3)
 
-# Panel labels and section headers.
-ideal_axes[0].text(-0.20, 1.20, "a", transform=ideal_axes[0].transAxes,
-                   fontsize=9, fontweight="bold", va="top")
-ideal_axes[0].text(0.0, 1.20, "Ideal periodic scattering field",
-                   transform=ideal_axes[0].transAxes, fontsize=8,
-                   fontweight="bold", va="top")
-finite_axes[0].text(-0.20, 1.20, "b", transform=finite_axes[0].transAxes,
-                    fontsize=9, fontweight="bold", va="top")
-finite_axes[0].text(0.0, 1.20, "Finite-beam scattering field",
-                    transform=finite_axes[0].transAxes, fontsize=8,
-                    fontweight="bold", va="top")
-for label, ax in zip(["c", "d", "e", "f", "g"],
-                     [ax_c, ax_d, ax_e, ax_f, ax_g]):
-    x_label = -0.12 if ax in [ax_c, ax_d] else -0.18
-    ax.text(x_label, 1.08, label, transform=ax.transAxes, fontsize=9,
+# f, intrinsic linewidth versus the angular-dispersion resolution floor.
+ax_f.semilogy(theta, np.maximum(eigen_width, 1e-8), color=DARK,
+              label="Bloch pole")
+for waist in [25., 100., 200.]:
+    ax_f.semilogy(theta, angular_bandwidths[waist],
+                  color=beam_colors[waist], label=rf"$w={int(waist)}$ mm")
+ax_f.axvline(THETA_BIC, color=LIGHT, lw=0.7)
+ax_f.set(xlabel=r"Central angle, $\theta$ (deg)",
+         ylabel="Spectral width (Hz)", xlim=(5.8, 8.5), ylim=(1e-8, 3e3))
+ax_f.legend(loc="lower left", handlelength=1.2)
+
+# g, experimentally actionable aperture/waist scaling.
+minimum_width = np.array([np.nanmin(angular_bandwidths[w]) for w in waist_grid])
+ax_g.loglog(waist_grid, minimum_width, "o-", color=BLUE,
+            ms=3.5, mfc="white", mec=BLUE, mew=0.8)
+ax_g.plot(25, minimum_width[0], "o", color=ORANGE, ms=5, zorder=3)
+ax_g.annotate("current\n80-mm aperture", xy=(25, minimum_width[0]),
+              xytext=(39, 780), color=ORANGE, fontsize=7,
+              arrowprops=dict(arrowstyle="-", color=ORANGE, lw=0.7))
+ax_g.set(xlabel="Beam waist (mm)", ylabel="Minimum width (Hz)",
+         xlim=(20, 360), ylim=(80, 2e3))
+ax_g.set_xticks([25, 50, 100, 200, 300])
+ax_g.get_xaxis().set_major_formatter(mpl.ticker.ScalarFormatter())
+ax_g.text(0.52, 0.12, r"matched aperture $\simeq3.2w$",
+          transform=ax_g.transAxes, ha="center", va="bottom",
+          color=GREY, fontsize=7)
+
+# Shared styling and panel labels.
+for label, ax in zip("abcdefg", [ax_a, ax_b, ax_c, ax_d, ax_e, ax_f, ax_g]):
+    x_panel = -0.23 if ax in [ax_e, ax_f, ax_g] else -0.13
+    y_panel = 1.15 if ax in [ax_e, ax_f, ax_g] else 1.08
+    ax.text(x_panel, y_panel, label, transform=ax.transAxes, fontsize=9,
             fontweight="bold", va="top")
-for ax in [*ideal_axes, *finite_axes, ax_c, ax_d, ax_e, ax_f, ax_g]:
+for ax in [ax_b, ax_c, ax_d, ax_e, ax_f, ax_g]:
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
 
 base = OUT / "Fig5_ideal_vs_finite_scattering"
-with open(OUT / "Fig5_cd_angular_spectra.csv", "w", newline="") as handle:
-    writer = csv.writer(handle)
-    writer.writerow(["system", "state", "frequency_hz", "kx_over_k0",
-                     "normalized_power_db"])
-    writer.writerows(spectrum_rows)
 fig.savefig(base.with_suffix(".svg"), bbox_inches="tight")
 fig.savefig(base.with_suffix(".pdf"), bbox_inches="tight")
 fig.savefig(base.with_suffix(".png"), dpi=600, bbox_inches="tight")

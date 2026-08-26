@@ -31,9 +31,10 @@ Run, in this order, with MATLAB LiveLink for COMSOL:
 6. `../Ni2019_MATLAB/run_fig4_wideangle_pole_180k.m`
 7. `plot_comsol_numerical_experiment.py`
 
-For the independent Fig. 5 finite-versus-ideal comparison, additionally run:
+For the independent Fig. 5 finite-beam regularization analysis, additionally
+run:
 
-8. `../Ni2019_MATLAB/run_fig5_infinite_period_scattering_fields.m`
+8. `../Ni2019_MATLAB/run_fig4_experimental_observables_180k.m`
 9. `plot_fig5_ideal_vs_finite_scattering.py`
 
 The first script creates the complete finite model and a coarse frequency
@@ -73,30 +74,25 @@ mathematical BIC.
 
 The field panels therefore are not interpreted by their absolute darkness.
 They expose the incident/reflected separation and provide the complex scan-line
-field used for an angular-spectrum decomposition. The direct scattering
-signature is the linewidth of the background-subtracted Floquet projection:
-its FWHM agrees with the outgoing eigenpole linewidth and approaches zero at
-the Rayleigh point. A nonzero background reflection at the BIC is expected and
-must not be misidentified as radiative leakage of the bound state.
+field used for an angular-spectrum decomposition. The direct experimental
+observable should be the complex, background-subtracted Floquet response
+recovered from that scan. A nonzero background reflection at the BIC is
+expected and must not be misidentified as radiative leakage of the bound state.
 
-In Fig. 5, the finite scan-line spectrum is evaluated as a dense, windowed
-spatial Fourier integral. This gives the continuous finite-aperture spectrum
-without changing the physical resolution, which remains approximately
-`Delta kx = 2*pi/L`. In the infinite Bloch-plane-wave limit the spectrum is not
-a continuous curve: it consists of discrete Floquet lines at `kx,n`. To make
-panels c and d directly comparable, panel c reconstructs those ideal complex
-Floquet fields at the same 20-mm height and applies the same 20-period Hann
-window used for the finite COMSOL scan. Its narrow continuous peaks are
-therefore the finite-observation representation of ideal Floquet delta lines,
-not intrinsic angular broadening. Both derived spectra are exported in
-`figures/comsol_numerical_experiment/Fig5_cd_angular_spectra.csv`.
+Figure 5 quantifies the distinction between the ideal single-Bloch-wave limit
+and a finite Gaussian source. The pressure envelope is
+`exp[-((x-xc)/w)^2]`, with `w=25 mm`; its angular intensity FWHM is about
+`7.2 deg` near the Rayleigh point. The pole spectral density is therefore
+convolved with a known angular weight. The resulting map is a forward
+prediction rather than COMSOL or experimental data.
 
-At the exact dark states the forced scattering matrix is singular because the
-homogeneous BIC can be added with arbitrary amplitude. The infinite-period
-Fig. 5 uses a `+0.1 Hz` limiting-background solution for the Gamma
-and Rayleigh columns. Consequently these total reflected fields visualize the
-measurable background, not the unexcited BIC eigenfield. The BIC discriminator
-remains the vanishing background-subtracted resonance linewidth.
+Because that convolution can be multipeaked, Fig. 5 does not assign it a
+potentially discontinuous envelope FWHM. Instead it reports the
+Gaussian-equivalent width of the pole center-frequency distribution sampled by
+the beam. This is an angular-dispersion resolution floor, distinct from the
+intrinsic outgoing-eigenpole linewidth. Predictions for larger waists assume a
+matched active width of about `3.2w` and a correspondingly longer sample; only
+the `w=25 mm`, `80 mm` aperture is the current model geometry.
 
 The large `.mph` files are published as release assets at:
 

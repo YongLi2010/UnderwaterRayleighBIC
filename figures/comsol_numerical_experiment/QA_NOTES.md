@@ -35,41 +35,44 @@ scale. The reflected field is obtained by complex subtraction on a common
 grid. The angular spectra use one Hann window over the full 148.4-mm scan line
 and are normalized only to each spectrum's own maximum for channel visibility.
 
-## Figure 5: ideal-versus-finite scattering
+## Figure 5: Gaussian-beam regularization of the Rayleigh BIC
 
-The companion comparison figure separates three effects that were previously
-visually conflated:
+Core conclusion: a finite Gaussian beam does not directly reproduce the
+single-Bloch-wave BIC limit, but its calibrated angular spectrum supplies a
+controlled route to recover the two channel responses and extrapolate toward
+that limit.
 
 | Panel | Unique claim | Source | Visual audit |
 |---|---|---|---|
-| a | The ideal infinite system produces pure Bloch-reflected fields | full modal-matching reflected fields | Pass; five displayed periods, no local normalization |
-| b | Finite aperture and edge scattering broaden the reflected field | three COMSOL sample/reference pairs | Pass; one incident normalization and one color scale |
-| c | Ideal Floquet lines observed through a finite measurement window | complex modal-matching Floquet coefficients, reconstructed at 20 mm | Pass; the same 20-period Hann-window projection as panel d is used |
-| d | A finite sample and Gaussian beam broaden the angular spectrum | dense windowed Fourier integral of COMSOL scan-line fields | Pass; the same axes, window length, and normalization as panel c are used |
-| e | The ideal plane-wave resonance pinches off at the BIC | pole-derived spectral density | Pass; logarithm is guarded |
-| f | The 25-mm-waist beam averages nearby leaky Bloch angles | Gaussian angular convolution of the same spectral density | Pass; same axes and color scale as panel e |
-| g | Finite angular width regularizes the vanishing linewidth | eigenpole, ideal driven-scattering FWHM, and Gaussian-convolved FWHM | Pass; logarithmic axis spans all three scales |
+| a | Complex reflected-field scanning can recover `r0(kx,f)` and `r-1(kx,f)` | current 20-period, 80-mm-aperture measurement geometry | Pass; schematic dimensions match the model |
+| b | The present `w=25 mm` source has a broad `7.2 deg` intensity FWHM | analytic Fourier transform of `exp[-(x/w)^2]` | Pass; all curves use the same normalization |
+| c | A single Bloch wave resolves the pole-linewidth pinch at the BIC | outgoing-eigenpole frequency and linewidth | Pass; guarded logarithm and exact BIC marker |
+| d | The current Gaussian beam averages the pinch over neighboring leaky states | angular convolution of the same pole spectral density | Pass; axes and color scale match panel c |
+| e | Both homogeneous radiation amplitudes close at the same BIC | directly computed `A0` and `A-1` eigenmode amplitudes | Pass; no scattering background is mixed into the amplitudes |
+| f | Angular averaging creates a finite spectral-resolution floor | pole linewidth and Gaussian-weighted frequency-distribution width | Pass; the floor is not labelled as an intrinsic linewidth |
+| g | Increasing waist systematically lowers that floor | the same forward model over `w=25--300 mm` | Pass; current aperture is explicitly identified |
 
-The first two infinite-period columns use a `+0.1 Hz` limiting-background
-solution because the exact forced problem is non-unique at a dark state. This
-regularization is stated in the reproduction notes and is not presented as a
-finite BIC linewidth. The displayed total background field is distinct from
-the homogeneous BIC eigenfield.
+The active source is `80 mm` wide, whereas the Gaussian waist is `25 mm`.
+For the pressure amplitude `exp[-(x/w)^2]`, the `1/e^2` intensity diameter is
+`2w=50 mm`; at the source edges the amplitude is approximately `0.077`.
 
-Panel d is extracted directly from the complex finite-sample COMSOL scan-line
-fields. Panels f and g are a predicted finite-beam frequency scan: the ideal
-pole-derived spectral density is averaged with the angular intensity of the
-`exp[-(x/w)^2]`, `w = 25 mm` source. Thus the approximately `600 Hz` apparent
-width is an aperture-averaging prediction, not a fitted linewidth from the
-three static COMSOL snapshots and not an experimental observation. The
-80-mm source truncation is neglected in this convolution because its Gaussian
-amplitude is only about `0.077` at each edge.
+Panels c and d use a shared absolute spectral-density scale. Panel d is a
+forward prediction, not COMSOL data or experimental data. The finite-beam
+spectral width in panels f and g is the Gaussian-equivalent FWHM of the pole
+center-frequency distribution induced by the known angular spectrum. This
+moment-based quantity is used because the fully convolved response can become
+multipeaked, making an envelope FWHM discontinuous and estimator-dependent.
+It therefore represents an angular-dispersion resolution floor, not a fitted
+resonance linewidth.
 
-Panels c and d now use an identical observation operator. For panel c, the
-ideal infinite-periodic pressure is reconstructed from the complex Floquet
-coefficients at `y = 20 mm`, sampled across `20a`, multiplied by a Hann window,
-and projected on a dense `kx/k0` grid. Panel d applies that projection directly
-to the finite-sample COMSOL reflected field. Thus the width of the ideal peaks
-in panel c is solely the selected observation-window resolution; in the
-infinite-window limit those peaks become discrete Floquet delta lines. The
-plotted data for both panels are exported in `Fig5_cd_angular_spectra.csv`.
+The wider-waist curves assume proportionally enlarged, weakly truncated
+sources. Keeping the present edge amplitude requires an active width of about
+`3.2w`; the sample must also be enlarged accordingly. They are design
+predictions and must not be described as results from the current 80-mm source.
+Quantitative source data are exported in `Fig5_gaussian_beam_scaling.csv` and
+`Fig5_minimum_width_vs_waist.csv`.
+
+Exports: editable SVG and PDF plus 600-dpi PNG/TIFF. The final PDF text audit
+passes with a minimum detected glyph size of `5.04 pt`. The static logarithm
+warning is a reviewed false positive: both spectral maps explicitly apply a
+`1e-6` positive display floor before `log10`.
