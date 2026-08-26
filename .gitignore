@@ -13,3 +13,12 @@ tmp/
 # Large reproducible raster exports; PDF/SVG/PNG counterparts are retained
 *.tif
 *.tiff
+
+# Finite-sample COMSOL binaries are distributed as GitHub release assets.
+/COMSOL_MATLAB/rounded_180k_results/finite_debug.mph
+/COMSOL_MATLAB/rounded_180k_results/finite_20period_experiment/*.mph
+
+# Regenerable, redundant finite-field grids not used by the paper figure.
+/COMSOL_MATLAB/rounded_180k_results/finite_20period_experiment/finite_field_*_pa.csv
+/COMSOL_MATLAB/rounded_180k_results/finite_20period_experiment/finite_bic_state_1_*_pa.csv
+/COMSOL_MATLAB/rounded_180k_results/finite_20period_experiment/finite_bic_state_3_*_pa.csv
