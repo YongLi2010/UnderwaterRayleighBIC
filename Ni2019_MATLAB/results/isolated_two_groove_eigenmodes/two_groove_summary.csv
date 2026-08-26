@@ -1,0 +1,3 @@
+mode,Re_f_extrapolated_Hz,Im_f_extrapolated_Hz,Q_extrapolated,surface_wide_fraction_K46,surface_narrow_fraction_K46,dominant_q_wide,dominant_q_narrow
+broad_q0_hybrid,187759.122435094,31671.3270456031,2.96418148448189,0.453605926896252,0.546394073103748,0,0
+narrow_q1_hybrid,200749.431175267,1519.80847581439,66.0443188631696,0.673612145672262,0.326387854327738,1,0

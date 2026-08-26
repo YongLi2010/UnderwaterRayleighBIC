@@ -1,0 +1,21 @@
+Fig. 2 source manifest
+
+(a) Geometry: StrictRayleighBIC_180kHz_7p10deg_final.mat
+    a=7.41666579 mm, w1=4.40887937 mm, w2=1.0032125 mm, g=1.00228696 mm, d1=5.14835025 mm, d2=1.32418485 mm.
+(b) Bands: physical-boundary branches plus the directly recomputed target
+    eigenvalue branch from Gamma to the BZ edge, mirrored by reciprocity.
+    Curve position is Re(Omega_p); colour is log10(Q), and therefore
+    encodes the vanishing imaginary part. The same target branch contains
+    a symmetry-protected Gamma BIC and the off-Gamma Rayleigh BIC.
+    Adjacent-sheet branches are
+    excluded from the main panel.
+(c,d) kx_channel_evolution_physical_180k/physical_sheet_channel_evolution.csv
+    Every off-BIC row satisfies the all-channel outgoing/decaying operator;
+    the exact strict endpoint contains A0=A-1=0 and ImOmega=0.
+(e) fig2_three_state_fields_180k/eigenmode_fields_gamma_bic_beyond.mat
+    The physical-sheet homogeneous exterior field is decomposed into
+    n=+1,0,-1 Floquet components over five periods and 3.2 periods in
+    height. Each nonzero component is normalized only by its magnitude at
+    y=0, preserving its actual vertical decay or propagation law.
+    Exact zeros remain exact and are shown by a red cross.
+    Gamma is the symmetry-protected BIC on the same physical target branch.

@@ -1,0 +1,93 @@
+%% Coupled QNMs of the present two grooves without periodic replication
+clear; close all; clc;
+thisFile=mfilename('fullpath'); solverDir=fileparts(thisFile);
+resultDir=fullfile(solverDir,'results','isolated_two_groove_eigenmodes');
+if ~exist(resultDir,'dir'), mkdir(resultDir); end
+addpath(solverDir);
+D=load(fullfile(solverDir,'results', ...
+    'StrictRayleighBIC_200kHz_min1mm.mat'));
+x=D.xFinal(:).'; a=D.aPhysical; cWater=D.cWater;
+widths=a*x(4:5); depths=a*x(2:3); gap=a*x(6);
+modeNames={'broad_q0_hybrid','narrow_q1_hybrid'};
+seed=[187.7+31.6i,200.74+1.52i]*1e3;
+Klist=[6 10 14 18 22 30 38 46].'; rows=[];
+poles=cell(2,numel(Klist));
+for modeIndex=1:2
+    fSeed=seed(modeIndex);
+    for j=1:numel(Klist)
+        K=Klist(j); smax=max(360,(K+12)*pi);
+        pole=ni2019_find_isolated_groove_cluster_pole(widths,depths, ...
+            gap,K,cWater,fSeed,'OuterIterations',8,'SMax',smax, ...
+            'PanelsPerPi',3);
+        fSeed=pole.frequency_hz; poles{modeIndex,j}=pole;
+        dominantQ=zeros(1,2);
+        for ell=1:2
+            [~,dominantQ(ell)]=max( ...
+                abs(pole.surface_pressure_by_groove(:,ell)).^2);
+        end
+        dominantQ=dominantQ-1;
+        rows=[rows;{modeNames{modeIndex},K,real(fSeed),imag(fSeed), ...
+            pole.Q,pole.sigma_ratio,pole.raw_residual, ...
+            pole.groove_fraction(1),pole.groove_fraction(2), ...
+            pole.surface_groove_fraction(1), ...
+            pole.surface_groove_fraction(2),dominantQ(1),dominantQ(2)}]; %#ok<AGROW>
+        fprintf('%s K=%d: f=(%.9f%+.9fi) kHz, Q=%.6f\n', ...
+            modeNames{modeIndex},K,real(fSeed)/1e3,imag(fSeed)/1e3,pole.Q);
+    end
+end
+convergence=cell2table(rows,'VariableNames',{'mode','K','Re_f_Hz', ...
+    'Im_f_Hz','Q','sigma_ratio','raw_residual','bottom_wide_fraction', ...
+    'bottom_narrow_fraction','surface_wide_fraction', ...
+    'surface_narrow_fraction','dominant_q_wide','dominant_q_narrow'});
+writetable(convergence,fullfile(resultDir,'two_groove_K_convergence.csv'));
+
+summaryRows=[];
+for modeIndex=1:2
+    tableMode=convergence(strcmp(convergence.mode,modeNames{modeIndex}),:);
+    fitRows=height(tableMode)-3:height(tableMode);
+    fitReal=polyfit(1./tableMode.K(fitRows),tableMode.Re_f_Hz(fitRows),1);
+    fitImag=polyfit(1./tableMode.K(fitRows),tableMode.Im_f_Hz(fitRows),1);
+    fInf=fitReal(2)+1i*fitImag(2);
+    summaryRows=[summaryRows;{modeNames{modeIndex},real(fInf),imag(fInf), ...
+        real(fInf)/(2*imag(fInf)),tableMode.surface_wide_fraction(end), ...
+        tableMode.surface_narrow_fraction(end), ...
+        tableMode.dominant_q_wide(end),tableMode.dominant_q_narrow(end)}]; %#ok<AGROW>
+end
+summary=cell2table(summaryRows,'VariableNames',{'mode', ...
+    'Re_f_extrapolated_Hz','Im_f_extrapolated_Hz','Q_extrapolated', ...
+    'surface_wide_fraction_K46','surface_narrow_fraction_K46', ...
+    'dominant_q_wide','dominant_q_narrow'});
+writetable(summary,fullfile(resultDir,'two_groove_summary.csv'));
+save(fullfile(resultDir,'two_groove_eigenmodes.mat'),'D','widths', ...
+    'depths','gap','Klist','poles','convergence','summary');
+
+colors=[.82,.32,.12;.08,.36,.58];
+fig=figure('Visible','off','Color','w','Units','inches', ...
+    'Position',[.5,.5,6.6,2.65]);
+set(fig,'DefaultAxesFontName','Helvetica','DefaultTextFontName','Helvetica', ...
+    'DefaultAxesFontSize',8,'DefaultTextFontSize',8, ...
+    'DefaultAxesLineWidth',.65,'DefaultLineLineWidth',1.1);
+tiledlayout(fig,1,2,'TileSpacing','compact','Padding','compact');
+nexttile; hold on;
+for m=1:2
+    select=strcmp(convergence.mode,modeNames{m});
+    plot(1./convergence.K(select),convergence.Re_f_Hz(select)/1e3, ...
+        'o-','Color',colors(m,:),'MarkerFaceColor',colors(m,:));
+end
+yline(200,'--','Color',[.35,.35,.35]); box on;
+xlabel('1/K'); ylabel('Re f_p (kHz)');
+legend('broad q=0 hybrid','narrow q=1 hybrid','BIC', ...
+    'Location','best','Box','off');
+nexttile; hold on;
+for m=1:2
+    select=strcmp(convergence.mode,modeNames{m});
+    plot(convergence.Re_f_Hz(select)/1e3, ...
+        convergence.Im_f_Hz(select)/1e3,'o-', ...
+        'Color',colors(m,:),'MarkerFaceColor',colors(m,:));
+end
+box on; xlabel('Re f_p (kHz)'); ylabel('Im f_p (kHz)');
+exportgraphics(fig,fullfile(resultDir,'two_groove_convergence.pdf'), ...
+    'ContentType','vector');
+exportgraphics(fig,fullfile(resultDir,'two_groove_convergence.png'), ...
+    'Resolution',300);
+disp(summary);
