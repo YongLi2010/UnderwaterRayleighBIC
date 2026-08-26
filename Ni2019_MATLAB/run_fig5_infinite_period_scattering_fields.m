@@ -1,10 +1,10 @@
-%% Ideal infinite-period plane-wave scattering fields for Fig. 4 comparison
+%% Ideal infinite-period plane-wave scattering fields for Fig. 5
 % Data only. Figure rendering is performed by the selected Python backend.
 % At the exact dark states the forced system is singular, so the first two
 % columns use the stable +0.1-Hz limiting background scattering solution.
 clear; clc;
 rootDir=fileparts(mfilename('fullpath'));
-outDir=fullfile(rootDir,'results','fig4_infinite_period_fields_180k');
+outDir=fullfile(rootDir,'results','fig5_infinite_period_fields_180k');
 if ~exist(outDir,'dir'), mkdir(outDir); end
 addpath(rootDir);
 

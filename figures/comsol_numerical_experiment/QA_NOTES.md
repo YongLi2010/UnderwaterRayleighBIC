@@ -35,21 +35,32 @@ scale. The reflected field is obtained by complex subtraction on a common
 grid. The angular spectra use one Hann window over the full 148.4-mm scan line
 and are normalized only to each spectrum's own maximum for channel visibility.
 
-## Finite-versus-infinite comparison
+## Figure 5: ideal-versus-finite scattering
 
 The companion comparison figure separates three effects that were previously
 visually conflated:
 
 | Panel | Unique claim | Source | Visual audit |
 |---|---|---|---|
-| a | Finite aperture and edge scattering broaden the measured field | three COMSOL sample/reference pairs | Pass; one incident normalization and one color scale |
-| b | An infinite Bloch plane wave has no aperture diffraction | full modal-matching reflected fields | Pass; five displayed periods, no local normalization |
-| c | A finite scan produces a continuous but resolution-limited angular spectrum | dense windowed Fourier integral of COMSOL scan-line fields | Pass; no raw FFT-bin joining |
-| d | The infinite far field consists of discrete Floquet lines | exact modal-matching power fractions | Pass; stems are used instead of continuous interpolation |
-| e | Channel opening alone is not the BIC criterion | pole linewidth and driven-scattering FWHM | Pass; independent quantities agree |
+| a | The ideal infinite system produces pure Bloch-reflected fields | full modal-matching reflected fields | Pass; five displayed periods, no local normalization |
+| b | Finite aperture and edge scattering broaden the reflected field | three COMSOL sample/reference pairs | Pass; one incident normalization and one color scale |
+| c | The infinite far field consists of discrete Floquet lines | exact modal-matching power fractions | Pass; stems are used instead of continuous interpolation |
+| d | A finite scan produces a continuous but resolution-limited angular spectrum | dense windowed Fourier integral of COMSOL scan-line fields | Pass; no raw FFT-bin joining |
+| e | The ideal plane-wave resonance pinches off at the BIC | pole-derived spectral density | Pass; logarithm is guarded |
+| f | The 25-mm-waist beam averages nearby leaky Bloch angles | Gaussian angular convolution of the same spectral density | Pass; same axes and color scale as panel e |
+| g | Finite angular width regularizes the vanishing linewidth | eigenpole, ideal driven-scattering FWHM, and Gaussian-convolved FWHM | Pass; logarithmic axis spans all three scales |
 
 The first two infinite-period columns use a `+0.1 Hz` limiting-background
 solution because the exact forced problem is non-unique at a dark state. This
 regularization is stated in the reproduction notes and is not presented as a
 finite BIC linewidth. The displayed total background field is distinct from
 the homogeneous BIC eigenfield.
+
+Panel d is extracted directly from the complex finite-sample COMSOL scan-line
+fields. Panels f and g are a predicted finite-beam frequency scan: the ideal
+pole-derived spectral density is averaged with the angular intensity of the
+`exp[-(x/w)^2]`, `w = 25 mm` source. Thus the approximately `600 Hz` apparent
+width is an aperture-averaging prediction, not a fitted linewidth from the
+three static COMSOL snapshots and not an experimental observation. The
+80-mm source truncation is neglected in this convolution because its Gaussian
+amplitude is only about `0.077` at each edge.
