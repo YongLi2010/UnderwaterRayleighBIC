@@ -83,8 +83,13 @@ In Fig. 5, the finite scan-line spectrum is evaluated as a dense, windowed
 spatial Fourier integral. This gives the continuous finite-aperture spectrum
 without changing the physical resolution, which remains approximately
 `Delta kx = 2*pi/L`. In the infinite Bloch-plane-wave limit the spectrum is not
-a continuous curve: it consists of discrete Floquet lines at `kx,n`. Figure 5
-therefore displays the ideal channels as stems rather than joining them.
+a continuous curve: it consists of discrete Floquet lines at `kx,n`. To make
+panels c and d directly comparable, panel c reconstructs those ideal complex
+Floquet fields at the same 20-mm height and applies the same 20-period Hann
+window used for the finite COMSOL scan. Its narrow continuous peaks are
+therefore the finite-observation representation of ideal Floquet delta lines,
+not intrinsic angular broadening. Both derived spectra are exported in
+`figures/comsol_numerical_experiment/Fig5_cd_angular_spectra.csv`.
 
 At the exact dark states the forced scattering matrix is singular because the
 homogeneous BIC can be added with arbitrary amplitude. The infinite-period

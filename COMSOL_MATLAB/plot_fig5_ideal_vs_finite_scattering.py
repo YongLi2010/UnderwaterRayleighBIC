@@ -28,6 +28,10 @@ ORANGE = "#E67E22"
 DARK = "#20262E"
 GREY = "#77818C"
 LIGHT = "#DCE2E7"
+SOUND_SPEED = 1500.0
+PERIOD_M = 7.42e-3
+SCAN_HEIGHT_M = 20e-3
+SAMPLE_PERIODS = 20
 
 
 def read_csv(path):
@@ -41,7 +45,34 @@ def continuous_spectrum(path, frequency_hz):
     data = read_csv(path)
     x = data["x_m"]
     field = data["reflected_real_pa"] + 1j * data["reflected_imag_pa"]
-    k0 = 2 * np.pi * frequency_hz / 1500
+    k0 = 2 * np.pi * frequency_hz / SOUND_SPEED
+    q = np.linspace(-1.25, 1.25, 1201)
+    spectrum = np.exp(-1j * np.outer(q * k0, x)) @ (
+        field * np.hanning(field.size))
+    power = np.abs(spectrum) ** 2
+    return q, 10 * np.log10(np.maximum(power / np.max(power), 1e-6))
+
+
+def ideal_windowed_spectrum(orders, state, frequency_hz):
+    """Apply the finite-sample measurement operator to an ideal Floquet field.
+
+    The infinite-periodic reflected field is reconstructed from its complex
+    Floquet coefficients at the same 20-mm observation height used by COMSOL.
+    A 20-period Hann window and the same dense Fourier projection as in panel d
+    turn the ideal delta-like Floquet lines into directly comparable curves.
+    """
+    select = orders["state"] == state
+    k0 = 2 * np.pi * frequency_hz / SOUND_SPEED
+    x = np.linspace(0, SAMPLE_PERIODS * PERIOD_M, 4001)
+    amplitude = (orders["amplitude_abs"][select]
+                 * np.exp(1j * orders["amplitude_phase_rad"][select]))
+    kx = orders["kx_over_k0"][select] * k0
+    ky = (orders["ky_real_over_k0"][select]
+          + 1j * orders["ky_imag_over_k0"][select]) * k0
+    field = np.sum(
+        amplitude[:, None]
+        * np.exp(-1j * (kx[:, None] * x[None, :]
+                        + ky[:, None] * SCAN_HEIGHT_M)), axis=0)
     q = np.linspace(-1.25, 1.25, 1201)
     spectrum = np.exp(-1j * np.outer(q * k0, x)) @ (
         field * np.hanning(field.size))
@@ -158,6 +189,8 @@ incident_scale = np.percentile(np.concatenate([
 finite_reflected = [field / incident_scale for field in finite_reflected]
 
 orders = read_csv(INF / "floquet_orders.csv")
+ideal_summary = read_csv(INF / "state_summary.csv")
+ideal_frequencies = ideal_summary["frequency_hz"]
 pole = read_csv(POLE / "wideangle_physical_pole.csv")
 theta_scattering, width_scattering = measured_fwhm(
     DRIVEN / "adaptive_scattering_response.csv")
@@ -216,35 +249,39 @@ for column, ax in enumerate(finite_axes):
 fig.colorbar(field_image, ax=[*ideal_axes, *finite_axes], fraction=0.010,
              pad=0.010, label=r"Re$(p_{\rm refl})/p_{\rm inc}$")
 
-# c, exact discrete Floquet powers of the infinite periodic fields.
-floor = 1e-8
-for state, color, label in zip([1, 2, 3], colors, titles):
-    select = (orders["state"] == state) & np.isin(orders["order"], [-1, 0])
-    q = -orders["kx_over_k0"][select]
-    eta = np.maximum(orders["power_fraction"][select], floor)
-    visible = ((orders["order"][select] == 0)
-               | (orders["is_propagating"][select] > 0))
-    q, eta = q[visible], eta[visible]
-    ax_c.vlines(q, floor, eta, color=color, lw=1.0, alpha=0.85)
-    ax_c.plot(q, eta, "o", ms=4.0, mfc="white", mec=color, mew=0.9,
-              label=label)
-ax_c.set_yscale("log")
+# c-d, identical field-to-spectrum extraction for ideal and finite systems.
+spectrum_rows = []
+for state, frequency, color, label in zip(
+        [1, 2, 3], ideal_frequencies, colors, titles):
+    q, spectrum = ideal_windowed_spectrum(orders, state, frequency)
+    ax_c.plot(q, spectrum, color=color, label=label)
+    spectrum_rows.extend(zip(np.full(q.size, "ideal_infinite"),
+                             np.full(q.size, state),
+                             np.full(q.size, frequency), q, spectrum))
 ax_c.axvline(-1, color=LIGHT, lw=0.65)
 ax_c.axvline(1, color=LIGHT, lw=0.65)
-ax_c.set(xlabel=r"Floquet line, $k_x/k_0$", ylabel="Power fraction",
-         xlim=(-1.15, 1.15), ylim=(1e-8, 2), xticks=[-1, 0, 1])
-ax_c.legend(loc="lower center", ncol=1, handlelength=0.8)
+ax_c.set(xlabel=r"Angular spectrum, $k_x/k_0$",
+         ylabel="Normalized power (dB)",
+         xlim=(-1.25, 1.25), ylim=(-60, 2), xticks=[-1, 0, 1])
+ax_c.set_title("Infinite periodic field", pad=3)
+ax_c.legend(loc="upper right", handlelength=1.4)
 
 # d, continuous finite-aperture spectra extracted from the COMSOL scan line.
 for stem, frequency, color, label in zip(
         finite_stems, frequencies, colors, titles):
     q, spectrum = continuous_spectrum(FIN / f"{stem}_scanline.csv", frequency)
     ax_d.plot(q, spectrum, color=color, label=label)
+    state = finite_stems.index(stem) + 1
+    spectrum_rows.extend(zip(np.full(q.size, "finite_gaussian"),
+                             np.full(q.size, state),
+                             np.full(q.size, frequency), q, spectrum))
 ax_d.axvspan(-1, 1, color="#F2F4F6", zorder=-3)
 ax_d.axvline(-1, color=LIGHT, lw=0.65)
 ax_d.axvline(1, color=LIGHT, lw=0.65)
 ax_d.set(xlabel=r"Angular spectrum, $k_x/k_0$",
-         ylabel="Windowed power (dB)", xlim=(-1.25, 1.25), ylim=(-60, 2))
+         ylabel="Normalized power (dB)",
+         xlim=(-1.25, 1.25), ylim=(-60, 2))
+ax_d.set_title("Finite Gaussian field", pad=3)
 ax_d.legend(loc="upper right", handlelength=1.4)
 
 # e-f, ideal spectral pinch versus the finite-beam angular average.
@@ -303,13 +340,19 @@ finite_axes[0].text(0.0, 1.20, "Finite-beam scattering field",
                     fontweight="bold", va="top")
 for label, ax in zip(["c", "d", "e", "f", "g"],
                      [ax_c, ax_d, ax_e, ax_f, ax_g]):
-    ax.text(-0.18, 1.08, label, transform=ax.transAxes, fontsize=9,
+    x_label = -0.12 if ax in [ax_c, ax_d] else -0.18
+    ax.text(x_label, 1.08, label, transform=ax.transAxes, fontsize=9,
             fontweight="bold", va="top")
 for ax in [*ideal_axes, *finite_axes, ax_c, ax_d, ax_e, ax_f, ax_g]:
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
 
 base = OUT / "Fig5_ideal_vs_finite_scattering"
+with open(OUT / "Fig5_cd_angular_spectra.csv", "w", newline="") as handle:
+    writer = csv.writer(handle)
+    writer.writerow(["system", "state", "frequency_hz", "kx_over_k0",
+                     "normalized_power_db"])
+    writer.writerows(spectrum_rows)
 fig.savefig(base.with_suffix(".svg"), bbox_inches="tight")
 fig.savefig(base.with_suffix(".pdf"), bbox_inches="tight")
 fig.savefig(base.with_suffix(".png"), dpi=600, bbox_inches="tight")

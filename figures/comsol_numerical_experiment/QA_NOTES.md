@@ -44,8 +44,8 @@ visually conflated:
 |---|---|---|---|
 | a | The ideal infinite system produces pure Bloch-reflected fields | full modal-matching reflected fields | Pass; five displayed periods, no local normalization |
 | b | Finite aperture and edge scattering broaden the reflected field | three COMSOL sample/reference pairs | Pass; one incident normalization and one color scale |
-| c | The infinite far field consists of discrete Floquet lines | exact modal-matching power fractions | Pass; stems are used instead of continuous interpolation |
-| d | A finite scan produces a continuous but resolution-limited angular spectrum | dense windowed Fourier integral of COMSOL scan-line fields | Pass; no raw FFT-bin joining |
+| c | Ideal Floquet lines observed through a finite measurement window | complex modal-matching Floquet coefficients, reconstructed at 20 mm | Pass; the same 20-period Hann-window projection as panel d is used |
+| d | A finite sample and Gaussian beam broaden the angular spectrum | dense windowed Fourier integral of COMSOL scan-line fields | Pass; the same axes, window length, and normalization as panel c are used |
 | e | The ideal plane-wave resonance pinches off at the BIC | pole-derived spectral density | Pass; logarithm is guarded |
 | f | The 25-mm-waist beam averages nearby leaky Bloch angles | Gaussian angular convolution of the same spectral density | Pass; same axes and color scale as panel e |
 | g | Finite angular width regularizes the vanishing linewidth | eigenpole, ideal driven-scattering FWHM, and Gaussian-convolved FWHM | Pass; logarithmic axis spans all three scales |
@@ -64,3 +64,12 @@ width is an aperture-averaging prediction, not a fitted linewidth from the
 three static COMSOL snapshots and not an experimental observation. The
 80-mm source truncation is neglected in this convolution because its Gaussian
 amplitude is only about `0.077` at each edge.
+
+Panels c and d now use an identical observation operator. For panel c, the
+ideal infinite-periodic pressure is reconstructed from the complex Floquet
+coefficients at `y = 20 mm`, sampled across `20a`, multiplied by a Hann window,
+and projected on a dense `kx/k0` grid. Panel d applies that projection directly
+to the finite-sample COMSOL reflected field. Thus the width of the ideal peaks
+in panel c is solely the selected observation-window resolution; in the
+infinite-window limit those peaks become discrete Floquet delta lines. The
+plotted data for both panels are exported in `Fig5_cd_angular_spectra.csv`.
