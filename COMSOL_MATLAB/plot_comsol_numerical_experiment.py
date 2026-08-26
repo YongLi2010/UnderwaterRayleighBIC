@@ -40,13 +40,16 @@ def angular_spectrum(path, frequency_hz):
     data = read_csv(path)
     x = data["x_m"]
     field = data["reflected_real_pa"] + 1j * data["reflected_imag_pa"]
-    dx = x[1] - x[0]
-    spectrum = np.fft.fftshift(np.fft.fft(field * np.hanning(field.size)))
-    kx = 2 * np.pi * np.fft.fftshift(np.fft.fftfreq(field.size, dx))
     k0 = 2 * np.pi * frequency_hz / 1500
+    # Evaluate the finite-window Fourier integral on a dense k grid. This is
+    # a smooth display of the measured aperture spectrum; it does not improve
+    # the physical resolution Delta kx ~ 2*pi/L.
+    kx_over_k0 = np.linspace(-1.25, 1.25, 1201)
+    phase = np.exp(-1j * np.outer(kx_over_k0 * k0, x))
+    spectrum = phase @ (field * np.hanning(field.size))
     power = np.abs(spectrum) ** 2
     power_db = 10 * np.log10(np.maximum(power / np.max(power), 1e-6))
-    return kx / k0, power_db
+    return kx_over_k0, power_db
 
 
 def measured_fwhm_from_complex_response(path):

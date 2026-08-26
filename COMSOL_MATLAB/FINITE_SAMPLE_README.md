@@ -31,6 +31,11 @@ Run, in this order, with MATLAB LiveLink for COMSOL:
 6. `../Ni2019_MATLAB/run_fig4_wideangle_pole_180k.m`
 7. `plot_comsol_numerical_experiment.py`
 
+For the finite-versus-infinite comparison, additionally run:
+
+8. `../Ni2019_MATLAB/run_fig4_infinite_period_scattering_fields.m`
+9. `plot_finite_vs_infinite_scattering.py`
+
 The first script creates the complete finite model and a coarse frequency
 sweep. The second resolves five angular cuts with a 2-Hz frequency step. The
 third exports fields at `f0-5 Hz`, `f0`, and `f0+5 Hz`, where
@@ -73,6 +78,21 @@ signature is the linewidth of the background-subtracted Floquet projection:
 its FWHM agrees with the outgoing eigenpole linewidth and approaches zero at
 the Rayleigh point. A nonzero background reflection at the BIC is expected and
 must not be misidentified as radiative leakage of the bound state.
+
+The finite scan-line spectrum is evaluated as a dense, windowed spatial
+Fourier integral. This removes the visual polygonal appearance of raw FFT bins
+without changing the physical resolution, which remains approximately
+`Delta kx = 2*pi/L`. In the infinite Bloch-plane-wave limit the spectrum is not
+a continuous curve: it consists of discrete Floquet lines at `kx,n`. The
+infinite-period comparison therefore displays these channels as stems rather
+than joining them with a line.
+
+At the exact dark states the forced scattering matrix is singular because the
+homogeneous BIC can be added with arbitrary amplitude. The infinite-period
+field comparison uses a `+0.1 Hz` limiting-background solution for the Gamma
+and Rayleigh columns. Consequently these total reflected fields visualize the
+measurable background, not the unexcited BIC eigenfield. The BIC discriminator
+remains the vanishing background-subtracted resonance linewidth.
 
 The large `.mph` files are published as release assets at:
 

@@ -34,3 +34,22 @@ adjustment, stitching, or selective masking. All six maps share one color
 scale. The reflected field is obtained by complex subtraction on a common
 grid. The angular spectra use one Hann window over the full 148.4-mm scan line
 and are normalized only to each spectrum's own maximum for channel visibility.
+
+## Finite-versus-infinite comparison
+
+The companion comparison figure separates three effects that were previously
+visually conflated:
+
+| Panel | Unique claim | Source | Visual audit |
+|---|---|---|---|
+| a | Finite aperture and edge scattering broaden the measured field | three COMSOL sample/reference pairs | Pass; one incident normalization and one color scale |
+| b | An infinite Bloch plane wave has no aperture diffraction | full modal-matching reflected fields | Pass; five displayed periods, no local normalization |
+| c | A finite scan produces a continuous but resolution-limited angular spectrum | dense windowed Fourier integral of COMSOL scan-line fields | Pass; no raw FFT-bin joining |
+| d | The infinite far field consists of discrete Floquet lines | exact modal-matching power fractions | Pass; stems are used instead of continuous interpolation |
+| e | Channel opening alone is not the BIC criterion | pole linewidth and driven-scattering FWHM | Pass; independent quantities agree |
+
+The first two infinite-period columns use a `+0.1 Hz` limiting-background
+solution because the exact forced problem is non-unique at a dark state. This
+regularization is stated in the reproduction notes and is not presented as a
+finite BIC linewidth. The displayed total background field is distinct from
+the homogeneous BIC eigenfield.
